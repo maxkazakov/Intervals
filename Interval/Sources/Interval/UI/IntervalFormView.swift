@@ -20,6 +20,42 @@ public struct IntervalFormView: View {
             NavigationView {
                 Form {
                     TextField("Name", text: viewStore.binding(get: \.name, send: IntervalAction.nameChanged))
+
+                    Section(content: {
+                        Picker.init("Finish type",
+                                    selection: viewStore.binding(get: \.finishType, send: IntervalAction.finishTypeChanged),
+                                    content: {
+                            ForEach(Array(IntervalFinishType.allCases.enumerated()), id: \.self.offset) { offset, element in
+                                Text(element.description)
+                                    .tag(element)
+                            }
+                        })
+
+                        SwitchStore(self.store.scope(state: \.finishType)) {
+                            CaseLet(state: /IntervalFinishType.byDistance,
+                                then: { (store: Store<Double, IntervalAction>) in
+                                    WithViewStore(store) { viewStore in
+                                        Text("\(viewStore.state)")
+                                    }
+                                })
+
+                            CaseLet(state: /IntervalFinishType.byDuration,
+                                    then: { (store: Store<Int, IntervalAction>) in
+                                WithViewStore(store) { viewStore in
+                                    Text("\(viewStore.state)")
+                                }
+                            })
+
+                            CaseLet(state: /IntervalFinishType.byTappingButton,
+                                    then: { (store: Store<Void, IntervalAction>) in
+                                WithViewStore(store) { viewStore in
+                                    EmptyView()
+                                }
+                            })
+                        }
+                    }, header: {
+                        Text("Duration")
+                    })
                 }
                 .navigationTitle("New interval")
             }

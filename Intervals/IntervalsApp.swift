@@ -13,7 +13,7 @@ public struct AppState: Equatable {
     var interval: Interval
 
     public init() {
-        self.interval = Interval(id: Interval.Id(), name: "", dateCreated: Date(), finishType: .byTappingButton)
+        self.interval = .default
     }
 }
 

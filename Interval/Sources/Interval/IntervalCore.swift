@@ -10,6 +10,7 @@ import ComposableArchitecture
 
 public enum IntervalAction: Equatable {
     case nameChanged(String)
+    case finishTypeChanged(IntervalFinishType)
 }
 
 public struct IntervalEnvironment {
@@ -20,6 +21,9 @@ public let intervalReducer = Reducer<Interval, IntervalAction, IntervalEnvironme
     switch action {
     case let .nameChanged(newName):
         state.name = newName
+        return .none
+    case let .finishTypeChanged(newFinishType):
+        state.finishType = newFinishType
         return .none
     }
 }
