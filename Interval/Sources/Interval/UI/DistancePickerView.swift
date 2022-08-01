@@ -51,6 +51,6 @@ struct DistancePickerView: View {
     }
 
     func format(ids: [Int]) -> String {
-        "\(indicesToMeters(ids: ids))"
+        "\(indicesToMeters(ids: ids)) m"
     }
 }

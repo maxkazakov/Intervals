@@ -46,7 +46,7 @@ public struct IntervalFormView: View {
                             CaseLet(state: /IntervalFinishType.byDuration,
                                     then: { (store: Store<Int, IntervalAction>) in
                                 WithViewStore(store) { viewStore in
-                                    SecondsPickerView(viewStore: viewStore)
+                                    SecondsPickerView(title: "Time", viewStore: viewStore) { IntervalAction.durationChanged(seconds: $0) }
                                 }
                             })
 
@@ -59,6 +59,24 @@ public struct IntervalFormView: View {
                         }
                     }, header: {
                         Text("Duration")
+                    })
+
+                    Section(content: {
+                        Toggle("Set pace range",
+                               isOn: viewStore.binding(get: { $0.paceRange != nil }, send: { IntervalAction.paceRange(enabled: $0 == true)
+                        }))
+
+                        IfLetStore(self.store.scope(state: \.paceRange), then: { store in
+                            WithViewStore(store.scope(state: \.from)) { viewStore in
+                                SecondsPickerView(title: "From:", viewStore: viewStore) { IntervalAction.paceRangeFromChanged($0) }
+                            }
+                            WithViewStore(store.scope(state: \.to)) { viewStore in
+                                SecondsPickerView(title: "To:", viewStore: viewStore) { IntervalAction.paceRangeToChanged($0) }
+                            }
+
+                        })
+                    }, header: {
+                        Text("Pace")
                     })
                 }
                 .navigationTitle("New interval")

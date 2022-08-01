@@ -10,15 +10,20 @@ import ComposableArchitecture
 
 struct SecondsPickerView: View {
 
+    let title: String
     let viewStore: ViewStore<Int, IntervalAction>
-    init(viewStore: ViewStore<Int, IntervalAction>) {
+    let actionFactory: (Int) -> IntervalAction
+    private let possibleMinutesOrSeconds = 0..<60
+
+    init(title: String, viewStore: ViewStore<Int, IntervalAction>, actionFactory: @escaping (Int) -> IntervalAction) {
+        self.title = title
         self.viewStore = viewStore
+        self.actionFactory = actionFactory
     }
-    private let possibleMinutesOrSeconds = Array(0..<60)
 
     var body: some View {
         HStack {
-            Text(NSLocalizedString("Time", comment: ""))
+            Text(title)
             MultiplePickerView(
                 "",
                 data: minutesOrSecondsData(),
@@ -32,7 +37,7 @@ struct SecondsPickerView: View {
                     let min = possibleMinutesOrSeconds[$0[0]]
                     let sec = possibleMinutesOrSeconds[$0[1]]
                     let newSeconds = min * 60 + sec
-                    return IntervalAction.durationChanged(seconds: newSeconds)
+                    return actionFactory(newSeconds)
                 }),
                 dataFormatter: { formatTime($0) }
             )

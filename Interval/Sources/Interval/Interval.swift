@@ -61,6 +61,8 @@ public struct PaceRange: Codable, Hashable {
         self.to = to
     }
 
-    public let from: Int
-    public let to: Int
+    public var from: Int
+    public var to: Int
+
+    public static let `default` = PaceRange(from: 60 * 5, to: 60 * 7)
 }

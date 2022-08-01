@@ -13,6 +13,9 @@ public enum IntervalAction: Equatable {
     case finishTypeChanged(IntervalFinishType)
     case durationChanged(seconds: Int)
     case distanceChanged(meters: Double)
+    case paceRange(enabled: Bool)
+    case paceRangeFromChanged(Int)
+    case paceRangeToChanged(Int)
 }
 
 public struct IntervalEnvironment {
@@ -32,6 +35,29 @@ public let intervalReducer = Reducer<Interval, IntervalAction, IntervalEnvironme
         return .none
     case let .distanceChanged(meters):
         state.finishType = .byDistance(meters: meters)
+        return .none
+    case let .paceRange(enabled):
+        if enabled {
+            state.paceRange = PaceRange.default
+        } else {
+            state.paceRange = nil
+        }
+        return .none
+    case let .paceRangeFromChanged(seconds):
+        guard var paceRange = state.paceRange else {
+            return .none
+        }
+        paceRange.from = seconds
+        paceRange.to = max(seconds, paceRange.to)
+        state.paceRange = paceRange
+        return .none
+    case let .paceRangeToChanged(seconds):
+        guard var paceRange = state.paceRange else {
+            return .none
+        }
+        paceRange.to = seconds
+        paceRange.from = min(seconds, paceRange.from)
+        state.paceRange = paceRange
         return .none
     }
 }
