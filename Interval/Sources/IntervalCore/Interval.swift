@@ -15,13 +15,13 @@ public struct Interval: Identifiable, Equatable {
                 name: String,
                 dateCreated: Date,
                 finishType: IntervalFinishType,
-                heartRange: PulseRange? = nil,
+                pulseRange: PulseRange? = nil,
                 paceRange: PaceRange? = nil) {
         self.id = id
         self.name = name
         self.dateCreated = dateCreated
         self.finishType = finishType
-        self.heartRange = heartRange
+        self.pulseRange = pulseRange
         self.paceRange = paceRange
     }
 
@@ -29,7 +29,7 @@ public struct Interval: Identifiable, Equatable {
     public var name: String
     public var dateCreated: Date
     public var finishType: IntervalFinishType
-    public var heartRange: PulseRange? = nil
+    public var pulseRange: PulseRange? = nil
     public var paceRange: PaceRange? = nil
 
     public static let `default` = Interval(id: Interval.Id(), name: "", dateCreated: Date(), finishType: .byTappingButton)
@@ -53,6 +53,10 @@ public enum IntervalFinishType: CaseIterable, Equatable {
 
 
 public typealias PulseRange = ClosedRange<Int>
+extension PulseRange {
+    public static let `default` = 140...160
+}
+
 
 /// meters per sec
 public struct PaceRange: Codable, Hashable {

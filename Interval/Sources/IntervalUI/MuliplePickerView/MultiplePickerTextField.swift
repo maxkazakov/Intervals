@@ -19,6 +19,11 @@ class MultiplePickerTextField: UITextField {
 
     // MARK: - Public properties
     var data: [Item]
+    {
+        didSet {
+            updateSelection()
+        }
+    }
     weak var multiplePickerDelegate: MultiplePickerTextFieldDelegate?
 
     // MARK: - Initializers
@@ -26,6 +31,7 @@ class MultiplePickerTextField: UITextField {
         self.data = data
         super.init(frame: .zero)
         self.inputView = pickerView
+        updateSelection()
 
         let bar = UIToolbar()
         bar.barStyle = UIBarStyle.default
@@ -54,11 +60,14 @@ class MultiplePickerTextField: UITextField {
         let pickerView = UIPickerView()
         pickerView.delegate = self
         pickerView.dataSource = self
+        return pickerView
+    }()
+
+    private func updateSelection() {
         data.enumerated().forEach { idx, item in
             pickerView.selectRow(item.selectedIdx, inComponent: idx, animated: false)
         }
-        return pickerView
-    }()
+    }
 }
 
 // MARK: - UIPickerViewDataSource & UIPickerViewDelegate extension

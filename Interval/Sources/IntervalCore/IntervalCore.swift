@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  IntervalCore.swift
 //  
 //
 //  Created by Максим Казаков on 31.07.2022.
@@ -13,9 +13,14 @@ public enum IntervalAction: Equatable {
     case finishTypeChanged(IntervalFinishType)
     case durationChanged(seconds: Int)
     case distanceChanged(meters: Double)
+
     case paceRange(enabled: Bool)
     case paceRangeFromChanged(Int)
     case paceRangeToChanged(Int)
+
+    case pulseRange(enabled: Bool)
+    case pulseRangeFromChanged(Int)
+    case pulseRangeToChanged(Int)
 }
 
 public struct IntervalEnvironment {
@@ -58,6 +63,22 @@ public let intervalReducer = Reducer<Interval, IntervalAction, IntervalEnvironme
         paceRange.to = seconds
         paceRange.from = min(seconds, paceRange.from)
         state.paceRange = paceRange
+        return .none
+
+    case let .pulseRange(enabled):
+        if enabled {
+            state.pulseRange = PulseRange.default
+        } else {
+            state.pulseRange = nil
+        }
+        return .none
+
+    case let .pulseRangeFromChanged(pulse):
+        state.pulseRange = pulse...max(pulse, state.pulseRange!.upperBound)
+        return .none
+
+    case let .pulseRangeToChanged(pulse):
+        state.pulseRange = min(pulse, state.pulseRange!.lowerBound)...pulse
         return .none
     }
 }

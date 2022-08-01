@@ -6,30 +6,9 @@
 //
 
 import SwiftUI
-import Interval
+import AppCore
+import AppUI
 import ComposableArchitecture
-
-public struct AppState: Equatable {
-    var interval: Interval
-
-    public init() {
-        self.interval = .default
-    }
-}
-
-public struct AppEnvironment {}
-
-public enum AppAction {
-    case interval(IntervalAction)
-}
-
-public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
-    intervalReducer.pullback(state: \.interval,
-                             action: /AppAction.interval,
-                             environment: { _ in
-                                 IntervalEnvironment()
-                             })
-)
 
 @main
 struct IntervalsApp: App {
@@ -41,7 +20,7 @@ struct IntervalsApp: App {
 
     var body: some Scene {
         WindowGroup {
-            IntervalFormView(store: self.store.scope(state: \.interval, action: AppAction.interval))
+            AppView(store: store)
         }
     }
 }

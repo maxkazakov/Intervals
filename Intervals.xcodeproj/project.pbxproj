@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9B9852F5289716320037A321 /* Interval in Frameworks */ = {isa = PBXBuildFile; productRef = 9B9852F4289716320037A321 /* Interval */; };
+		9B862932289878160074739C /* AppCore in Frameworks */ = {isa = PBXBuildFile; productRef = 9B862931289878160074739C /* AppCore */; };
+		9B862934289878190074739C /* AppUI in Frameworks */ = {isa = PBXBuildFile; productRef = 9B862933289878190074739C /* AppUI */; };
 		9BADAA852895648D00A32855 /* IntervalsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BADAA842895648D00A32855 /* IntervalsApp.swift */; };
 		9BADAA872895648D00A32855 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BADAA862895648D00A32855 /* ContentView.swift */; };
 		9BADAA892895648F00A32855 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9BADAA882895648F00A32855 /* Assets.xcassets */; };
@@ -53,7 +54,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B9852F5289716320037A321 /* Interval in Frameworks */,
+				9B862934289878190074739C /* AppUI in Frameworks */,
+				9B862932289878160074739C /* AppCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,7 +158,8 @@
 			);
 			name = Intervals;
 			packageProductDependencies = (
-				9B9852F4289716320037A321 /* Interval */,
+				9B862931289878160074739C /* AppCore */,
+				9B862933289878190074739C /* AppUI */,
 			);
 			productName = Intervals;
 			productReference = 9BADAA812895648D00A32855 /* Intervals.app */;
@@ -600,9 +603,13 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9B9852F4289716320037A321 /* Interval */ = {
+		9B862931289878160074739C /* AppCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Interval;
+			productName = AppCore;
+		};
+		9B862933289878190074739C /* AppUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

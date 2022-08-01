@@ -9,10 +9,21 @@ let package = Package(
         .iOS(.v14)
     ],
     products: [
-        // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "Interval",
-            targets: ["Interval"]),
+            name: "AppCore",
+            targets: ["AppCore"]),
+        .library(
+            name: "AppUI",
+            targets: ["AppUI"]),
+        .library(
+            name: "IntervalCore",
+            targets: ["IntervalCore"]),
+        .library(
+            name: "IntervalUI",
+            targets: ["IntervalUI"]),
+        .library(
+            name: "IntervalList",
+            targets: ["IntervalList"]),
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.38.3"),
@@ -21,10 +32,41 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "Interval",
-            dependencies: [.product(name: "ComposableArchitecture", package: "swift-composable-architecture")]),
+            name: "AppCore",
+            dependencies: [
+                "IntervalCore",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
+        ),
+        .target(
+            name: "AppUI",
+            dependencies: [
+                "AppCore",
+                "IntervalUI",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
+        ),
+        .target(
+            name: "IntervalCore",
+            dependencies: [.product(name: "ComposableArchitecture", package: "swift-composable-architecture")]
+        ),
+        .target(
+            name: "IntervalUI",
+            dependencies: [
+                "IntervalCore",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
+        ),
+        .target(
+            name: "IntervalList",
+            dependencies: [
+                "IntervalCore",
+                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
+        ),
         .testTarget(
-            name: "IntervalTests",
-            dependencies: ["Interval"]),
+            name: "IntervalCoreTests",
+            dependencies: ["IntervalCore"]
+        ),
     ]
 )

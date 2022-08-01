@@ -1,5 +1,5 @@
 //
-//  SwiftUIView.swift
+//  TimePickerView.swift
 //  
 //
 //  Created by Максим Казаков on 01.08.2022.
@@ -7,13 +7,14 @@
 
 import SwiftUI
 import ComposableArchitecture
+import IntervalCore
 
-struct SecondsPickerView: View {
+struct TimePickerView: View {
 
     let title: String
     let viewStore: ViewStore<Int, IntervalAction>
     let actionFactory: (Int) -> IntervalAction
-    private let possibleMinutesOrSeconds = 0..<60
+    private let possibleMinutesOrSeconds = Array(0..<60)
 
     init(title: String, viewStore: ViewStore<Int, IntervalAction>, actionFactory: @escaping (Int) -> IntervalAction) {
         self.title = title
@@ -43,7 +44,6 @@ struct SecondsPickerView: View {
             )
         }
     }
-
 
     private func minutesOrSecondsData() -> [[String]] {
         [

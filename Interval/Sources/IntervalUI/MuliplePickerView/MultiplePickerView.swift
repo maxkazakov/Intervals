@@ -40,6 +40,9 @@ struct MultiplePickerView: UIViewRepresentable {
 
     func updateUIView(_ uiView: MultiplePickerTextField, context: UIViewRepresentableContext<MultiplePickerView>) {
         uiView.text = self.dataFormatter(self.selectionIndices)
+        uiView.data = zip(self.data, self.selectionIndices).map {
+            MultiplePickerTextField.Item(values: $0, selectedIdx: $1)
+        }
     }
 
     final class Coorinator: NSObject, MultiplePickerTextFieldDelegate {

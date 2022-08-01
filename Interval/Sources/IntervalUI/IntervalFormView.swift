@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import IntervalCore
 
 public struct IntervalFormView: View {
     let store: Store<Interval, IntervalAction>
@@ -46,7 +47,7 @@ public struct IntervalFormView: View {
                             CaseLet(state: /IntervalFinishType.byDuration,
                                     then: { (store: Store<Int, IntervalAction>) in
                                 WithViewStore(store) { viewStore in
-                                    SecondsPickerView(title: "Time", viewStore: viewStore) { IntervalAction.durationChanged(seconds: $0) }
+                                    TimePickerView(title: "Time", viewStore: viewStore) { IntervalAction.durationChanged(seconds: $0) }
                                 }
                             })
 
@@ -68,15 +69,32 @@ public struct IntervalFormView: View {
 
                         IfLetStore(self.store.scope(state: \.paceRange), then: { store in
                             WithViewStore(store.scope(state: \.from)) { viewStore in
-                                SecondsPickerView(title: "From:", viewStore: viewStore) { IntervalAction.paceRangeFromChanged($0) }
+                                TimePickerView(title: "From", viewStore: viewStore) { IntervalAction.paceRangeFromChanged($0) }
                             }
                             WithViewStore(store.scope(state: \.to)) { viewStore in
-                                SecondsPickerView(title: "To:", viewStore: viewStore) { IntervalAction.paceRangeToChanged($0) }
+                                TimePickerView(title: "To", viewStore: viewStore) { IntervalAction.paceRangeToChanged($0) }
                             }
 
                         })
                     }, header: {
                         Text("Pace")
+                    })
+
+                    Section(content: {
+                        Toggle("Set pulse range",
+                               isOn: viewStore.binding(get: { $0.pulseRange != nil }, send: { IntervalAction.pulseRange(enabled: $0 == true)
+                        }))
+
+                        IfLetStore(self.store.scope(state: \.pulseRange), then: { store in
+                            WithViewStore(store.scope(state: \.lowerBound)) { viewStore in
+                                IntPickerView(title: "From", viewStore: viewStore) { IntervalAction.pulseRangeFromChanged($0) }
+                            }
+                            WithViewStore(store.scope(state: \.upperBound)) { viewStore in
+                                IntPickerView(title: "To", viewStore: viewStore) { IntervalAction.pulseRangeToChanged($0) }
+                            }
+                        })
+                    }, header: {
+                        Text("Pulse")
                     })
                 }
                 .navigationTitle("New interval")

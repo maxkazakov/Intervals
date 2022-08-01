@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import Foundation
+import IntervalCore
 
 struct DistancePickerView: View {
 
@@ -16,8 +17,8 @@ struct DistancePickerView: View {
         self.viewStore = viewStore
     }
 
-    private let possibleDistanceIntegerValues = (0...100).map { $0 }
-    private let possibleDistanceFractionalValues = stride(from: 0, to: 1000, by: 100).map { $0 }
+    private let possibleDistanceIntegerValues = Array(0...100)
+    private let possibleDistanceFractionalValues = Array(stride(from: 0, to: 1000, by: 100))
 
     var body: some View {
         HStack {
