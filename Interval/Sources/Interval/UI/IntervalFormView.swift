@@ -22,14 +22,18 @@ public struct IntervalFormView: View {
                     TextField("Name", text: viewStore.binding(get: \.name, send: IntervalAction.nameChanged))
 
                     Section(content: {
-                        Picker.init("Finish type",
-                                    selection: viewStore.binding(get: \.finishType, send: IntervalAction.finishTypeChanged),
-                                    content: {
-                            ForEach(Array(IntervalFinishType.allCases.enumerated()), id: \.self.offset) { offset, element in
-                                Text(element.description)
-                                    .tag(element)
-                            }
-                        })
+                        Picker(
+                            "Finish type",
+                            selection: viewStore.binding(
+                                get: { ViewFinishType(finishType: $0.finishType) },
+                                send: { IntervalAction.finishTypeChanged($0.finishType) }
+                            ),
+                            content: {
+                                ForEach(IntervalFinishType.allCases.map(ViewFinishType.init(finishType:))) { type in
+                                    Text(type.description)
+                                        .tag(type)
+                                }
+                            })
 
                         SwitchStore(self.store.scope(state: \.finishType)) {
                             CaseLet(state: /IntervalFinishType.byDistance,
@@ -42,7 +46,7 @@ public struct IntervalFormView: View {
                             CaseLet(state: /IntervalFinishType.byDuration,
                                     then: { (store: Store<Int, IntervalAction>) in
                                 WithViewStore(store) { viewStore in
-                                    Text("\(viewStore.state)")
+                                    SecondsPickerView(viewStore: viewStore)
                                 }
                             })
 
@@ -64,8 +68,30 @@ public struct IntervalFormView: View {
     }
 }
 
-//struct SwiftUIView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        SwiftUIView()
-//    }
-//}
+struct ViewFinishType: Identifiable, Hashable {
+    let finishType: IntervalFinishType
+
+    var id: Int {
+        switch finishType {
+        case .byDuration: return 0
+        case .byDistance: return 1
+        case .byTappingButton: return 2
+        }
+    }
+
+    var description: String {
+        switch finishType {
+        case .byDuration: return "By duration"
+        case .byDistance: return "By distance"
+        case .byTappingButton: return "By tapping button"
+        }
+    }
+
+    func hash(into hasher: inout Hasher) {
+        id.hash(into: &hasher)
+    }
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.id == rhs.id
+    }
+}

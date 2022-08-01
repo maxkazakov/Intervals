@@ -35,41 +35,20 @@ public struct Interval: Identifiable, Equatable {
     public static let `default` = Interval(id: Interval.Id(), name: "", dateCreated: Date(), finishType: .byTappingButton)
 }
 
-public enum IntervalFinishType: Equatable, CaseIterable, Hashable {
+public enum IntervalFinishType: CaseIterable, Equatable {
     public static let defaultIntervalDuration = 60 * 5
     public static let defaultIntervalDistance = 1000.0
     public static var allCases: [IntervalFinishType] = [.byTappingButton,
                                                         .byDuration(seconds: defaultIntervalDuration),
-                                                        .byDistance(defaultIntervalDistance)
+                                                        .byDistance(meters: defaultIntervalDistance)
     ]
 
     /// time in seconds
     case byDuration(seconds: Int)
     /// meters
-    case byDistance(Double)
+    case byDistance(meters: Double)
     ///
     case byTappingButton
-
-    // This is needed for ForEach
-    public var id: Int {
-        switch self {
-        case .byDuration: return 0
-        case .byDistance: return 1
-        case .byTappingButton: return 2
-        }
-    }
-
-    public var description: String {
-        switch self {
-        case .byDuration: return "By duration"
-        case .byDistance: return "By distance"
-        case .byTappingButton: return "By tapping button"
-        }
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(self.id)
-    }
 }
 
 
