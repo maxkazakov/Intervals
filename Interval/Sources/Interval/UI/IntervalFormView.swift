@@ -39,7 +39,7 @@ public struct IntervalFormView: View {
                             CaseLet(state: /IntervalFinishType.byDistance,
                                 then: { (store: Store<Double, IntervalAction>) in
                                     WithViewStore(store) { viewStore in
-                                        Text("\(viewStore.state)")
+                                        DistancePickerView(viewStore: viewStore)
                                     }
                                 })
 

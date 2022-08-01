@@ -12,6 +12,7 @@ public enum IntervalAction: Equatable {
     case nameChanged(String)
     case finishTypeChanged(IntervalFinishType)
     case durationChanged(seconds: Int)
+    case distanceChanged(meters: Double)
 }
 
 public struct IntervalEnvironment {
@@ -28,6 +29,9 @@ public let intervalReducer = Reducer<Interval, IntervalAction, IntervalEnvironme
         return .none
     case let .durationChanged(seconds):
         state.finishType = .byDuration(seconds: seconds)
+        return .none
+    case let .distanceChanged(meters):
+        state.finishType = .byDistance(meters: meters)
         return .none
     }
 }

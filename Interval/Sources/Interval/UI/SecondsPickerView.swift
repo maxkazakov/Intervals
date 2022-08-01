@@ -34,10 +34,11 @@ struct SecondsPickerView: View {
                     let newSeconds = min * 60 + sec
                     return IntervalAction.durationChanged(seconds: newSeconds)
                 }),
-                dataFormatter: { formatPace(strings: $0) }
+                dataFormatter: { formatTime($0) }
             )
         }
     }
+
 
     private func minutesOrSecondsData() -> [[String]] {
         [
@@ -46,7 +47,9 @@ struct SecondsPickerView: View {
         ]
     }
 
-    private func formatPace(strings: [String]) -> String {
-        "\(strings[0]):\(String(format: "%02d", Int(strings[1])!))"
+    private func formatTime(_ indices: [Int]) -> String {
+        let minutes = possibleMinutesOrSeconds[indices[0]]
+        let seconds = possibleMinutesOrSeconds[indices[1]]
+        return "\(minutes):\(String(format: "%02d", seconds))"
     }
 }

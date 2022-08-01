@@ -11,10 +11,10 @@ struct MultiplePickerView: UIViewRepresentable {
 
     @Binding var selectionIndices: [Int]
     var data: [[String]]
-    var dataFormatter: ([String]) -> String
+    var dataFormatter: ([Int]) -> String
 
     // MARK: - Initializers
-    init<S>(_ title: S, data: [[String]], selectionIndices: Binding<[Int]>, dataFormatter: @escaping ([String]) -> String) where S: StringProtocol {
+    init<S>(_ title: S, data: [[String]], selectionIndices: Binding<[Int]>, dataFormatter: @escaping ([Int]) -> String) where S: StringProtocol {
         self.placeholder = String(title)
         self.data = data
         self.dataFormatter = dataFormatter
@@ -39,10 +39,7 @@ struct MultiplePickerView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: MultiplePickerTextField, context: UIViewRepresentableContext<MultiplePickerView>) {
-        let selectedStrings = self.selectionIndices.enumerated().map { idx, value in
-            self.data[idx][value]
-        }
-        uiView.text = self.dataFormatter(selectedStrings)
+        uiView.text = self.dataFormatter(self.selectionIndices)
     }
 
     final class Coorinator: NSObject, MultiplePickerTextFieldDelegate {
