@@ -96,7 +96,8 @@ public struct IntervalFormView: View {
                     Text("Pulse")
                 })
             }
-            .navigationTitle("New interval")
+            .navigationTitle("Editing")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }

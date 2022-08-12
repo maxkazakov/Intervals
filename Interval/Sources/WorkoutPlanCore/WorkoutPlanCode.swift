@@ -13,6 +13,7 @@ import IdentifiedCollections
 public struct WorkoutPlan: Equatable {
     public var name: String
     public var intervals: IdentifiedArrayOf<Interval> = []
+    public var editingInterval: Interval?
 
     public init(name: String, intervals: IdentifiedArrayOf<Interval>) {
         self.name = name
@@ -39,6 +40,9 @@ public enum WorkoutPlanAction {
     case moveIntervals(fromOffsets: IndexSet, toOffset: Int)
 
     case interval(id: Interval.Id, action: IntervalAction)
+
+    case startEditInterval(id: Interval)
+    case finishEditInterval
 }
 
 public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutPlanEnvironment> { state, action, _ in
@@ -60,6 +64,14 @@ public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutP
         state.intervals.move(fromOffsets: fromOffsets, toOffset: toOffset)
         return .none
 
+    case let .startEditInterval(interval):
+        state.editingInterval = interval
+        return .none
+
+    case .finishEditInterval:
+        state.editingInterval = nil
+        return .none
+        
     case .interval:
         return .none
     }

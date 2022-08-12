@@ -14,7 +14,7 @@ import ComposableArchitecture
 public struct WorkoutPlanView: View {
 
     public let store: Store<WorkoutPlan, WorkoutPlanAction>
-    @State var openedInterval: Interval.Id?
+    @State var openedInterval: Interval?
 
     public init(store: Store<WorkoutPlan, WorkoutPlanAction>) {
         self.store = store
@@ -24,16 +24,9 @@ public struct WorkoutPlanView: View {
         WithViewStore(store) { viewStore in
             NavigationView {
                 List {
-                    ForEachStore(
-                        self.store.scope(state: \.intervals, action: WorkoutPlanAction.interval(id:action:))
-                    ) { intervalStore in
-                        WithViewStore(intervalStore) { viewStore in
-                            NavigationLink(tag: viewStore.state.id, selection: $openedInterval, destination: {
-                                IntervalFormView(store: intervalStore)
-                            }, label: {
-                                Text(viewStore.state.name)
-                            })
-                        }
+                    ForEachStore(self.store.scope(state: \.intervals, action: WorkoutPlanAction.interval(id:action:))) { intervalStore in
+                        IntervalRowView(intervalStore: intervalStore,
+                                        onTap: { viewStore.send(.startEditInterval(id: $0)) })
                     }
                     .onDelete(perform: { viewStore.send(.removeIntervals(indices: $0)) })
                     .onMove(perform: { viewStore.send(.moveIntervals(fromOffsets: $0, toOffset: $1)) })
@@ -46,9 +39,36 @@ public struct WorkoutPlanView: View {
                 )
                 .navigationTitle(viewStore.name)
             }
+            .sheet(item: viewStore.binding(get: \.editingInterval, send: { _ in WorkoutPlanAction.finishEditInterval }), content: { interval in
+                NavigationView {
+                    IntervalFormView(
+                        store: self.store.scope(
+                            state: { $0.intervals[id: interval.id]! },
+                            action: { WorkoutPlanAction.interval(id: interval.id, action: $0) })
+                    )
+                        .navigationBarTitle(viewStore.state.name)
+                }
+                .navigationViewStyle(.stack)
+            })
         }
     }
 }
+
+struct IntervalRowView: View {
+    let intervalStore: Store<Interval, IntervalAction>
+    let onTap: (Interval) -> Void
+
+    var body: some View {
+        WithViewStore(intervalStore) { viewStore in
+            Button(action: { onTap(viewStore.state) }, label: {
+                VStack(alignment: .leading) {
+                    Text(viewStore.state.name)
+                }
+            })
+        }
+    }
+}
+
 //
 //struct SwiftUIView_Previews: PreviewProvider {
 //    static var previews: some View {
