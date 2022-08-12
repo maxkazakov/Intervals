@@ -7,8 +7,9 @@
 
 import SwiftUI
 import AppCore
-import IntervalUI
+import WorkoutPlanUI
 import ComposableArchitecture
+
 
 public struct AppView: View {
     let store: Store<AppState, AppAction>
@@ -18,7 +19,7 @@ public struct AppView: View {
     }
 
     public var body: some View {
-        IntervalFormView(store: self.store.scope(state: \.interval, action: AppAction.interval))
+        WorkoutPlanView(store: self.store.scope(state: \.workoutPlan, action: AppAction.workoutPlan))
     }
 }
 

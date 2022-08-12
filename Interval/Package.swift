@@ -22,19 +22,20 @@ let package = Package(
             name: "IntervalUI",
             targets: ["IntervalUI"]),
         .library(
-            name: "IntervalList",
-            targets: ["IntervalList"]),
+            name: "WorkoutPlanCore",
+            targets: ["WorkoutPlanCore"]),
+        .library(
+            name: "WorkoutPlanUI",
+            targets: ["WorkoutPlanUI"]),
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.39.0"),
     ],
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "AppCore",
             dependencies: [
-                "IntervalCore",
+                "WorkoutPlanCore",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
@@ -42,7 +43,7 @@ let package = Package(
             name: "AppUI",
             dependencies: [
                 "AppCore",
-                "IntervalUI",
+                "WorkoutPlanUI",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
@@ -58,10 +59,16 @@ let package = Package(
             ]
         ),
         .target(
-            name: "IntervalList",
+            name: "WorkoutPlanCore",
             dependencies: [
                 "IntervalCore",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+            ]
+        ),
+        .target(
+            name: "WorkoutPlanUI",
+            dependencies: [
+                "IntervalUI",
+                "WorkoutPlanCore"
             ]
         ),
         .testTarget(

@@ -13,7 +13,7 @@ public struct Interval: Identifiable, Equatable {
 
     public init(id: Id,
                 name: String,
-                dateCreated: Date,
+                dateCreated: Date = Date(),
                 finishType: IntervalFinishType,
                 pulseRange: PulseRange? = nil,
                 paceRange: PaceRange? = nil) {
@@ -33,6 +33,10 @@ public struct Interval: Identifiable, Equatable {
     public var paceRange: PaceRange? = nil
 
     public static let `default` = Interval(id: Interval.Id(), name: "", dateCreated: Date(), finishType: .byTappingButton)
+
+    public static func make(with name: String, and finishType: IntervalFinishType) -> Interval {
+        Interval(id: Interval.Id(), name: name, dateCreated: Date(), finishType: finishType)
+    }
 }
 
 public enum IntervalFinishType: CaseIterable, Equatable {
