@@ -82,4 +82,3 @@ public let intervalReducer = Reducer<Interval, IntervalAction, IntervalEnvironme
         return .none
     }
 }
-    .debug()

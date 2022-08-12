@@ -8,15 +8,24 @@
 import SwiftUI
 import IntervalCore
 import ComposableArchitecture
+import IdentifiedCollections
 
 public struct WorkoutPlan: Equatable {
     public var name: String
-    public var intervals: [Interval]
+    public var intervals: IdentifiedArrayOf<Interval> = []
 
-    public init(name: String, intervals: [Interval]) {
+    public init(name: String, intervals: IdentifiedArrayOf<Interval>) {
         self.name = name
         self.intervals = intervals
     }
+
+    public static let `default` = WorkoutPlan(
+        name: "Workout Plan 1",
+        intervals: [
+            .make(with: "Warm up", and: .byDuration(seconds: 60 * 5)),
+            .make(with: "Workout", and: .byDistance(meters: 1000))
+        ]
+    )
 }
 
 public struct WorkoutPlanEnvironment {
@@ -25,8 +34,11 @@ public struct WorkoutPlanEnvironment {
 
 public enum WorkoutPlanAction {
     case nameChanged(String)
-    case addNewInterval(Interval)
-    case removeInterval(indices: Set<Int>)
+    case addNewInterval
+    case removeIntervals(indices: IndexSet)
+    case moveIntervals(fromOffsets: IndexSet, toOffset: Int)
+
+    case interval(id: Interval.Id, action: IntervalAction)
 }
 
 public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutPlanEnvironment> { state, action, _ in
@@ -35,12 +47,24 @@ public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutP
         state.name = newName
         return .none
 
-    case let .addNewInterval(newInterval):
+    case .addNewInterval:
+        let newInterval = Interval.make(with: "New interval", and: .byTappingButton)
         state.intervals.append(newInterval)
         return .none
 
-    case let .removeInterval(indices):
+    case let .removeIntervals(indices):
         indices.forEach { state.intervals.remove(at: $0) }
         return .none
+
+    case let .moveIntervals(fromOffsets, toOffset):
+        state.intervals.move(fromOffsets: fromOffsets, toOffset: toOffset)
+        return .none
+
+    case .interval:
+        return .none
     }
-}
+}.combined(with: intervalReducer.forEach(
+    state: \.intervals,
+    action: /WorkoutPlanAction.interval(id:action:),
+    environment: { _ in IntervalEnvironment() }
+))
