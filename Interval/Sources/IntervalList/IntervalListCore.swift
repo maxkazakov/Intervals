@@ -9,6 +9,8 @@ import Foundation
 import ComposableArchitecture
 
 public enum IntervalListAction: Equatable {
+    case saveDraft
+    case add
 }
 
 public struct IntervalListEnvironment {
