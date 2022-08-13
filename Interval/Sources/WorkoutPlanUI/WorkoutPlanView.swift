@@ -43,19 +43,19 @@ public struct WorkoutPlanView: View {
             .sheet(
                 isPresented: viewStore.binding(get: { $0.editingIntervalId != nil }, send: { _ in WorkoutPlanAction.finishEditInterval }),
                 content: {
-                    if let editingIntervalId = viewStore.state.editingIntervalId {
-                        NavigationView {
-                            IntervalFormView(
-                                store: self.store.scope(
-                                    state: { $0.intervals[id: editingIntervalId]! },
-                                    action: { WorkoutPlanAction.interval(id: editingIntervalId, action: $0) })
-                            )
-                            .navigationBarTitle(viewStore.state.name)
+                    IfLetStore(self.store.scope(state: \.editingIntervalId), then: { editingIdStore in
+                        WithViewStore(editingIdStore) { editingIdViewStore in
+                            let editingId = editingIdViewStore.state
+                            NavigationView {
+                                IntervalFormView(
+                                    store: self.store.scope(
+                                        state: { $0.intervals[id: editingId]! },
+                                        action: { WorkoutPlanAction.interval(id: editingId, action: $0) })
+                                )
+                            }
+                            .navigationViewStyle(.stack)
                         }
-                        .navigationViewStyle(.stack)
-                    } else {
-                        EmptyView()
-                    }
+                    })
                 })
         }
     }
