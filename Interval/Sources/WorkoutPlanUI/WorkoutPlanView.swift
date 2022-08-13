@@ -24,14 +24,25 @@ public struct WorkoutPlanView: View {
         WithViewStore(store) { viewStore in
             NavigationView {
                 List {
+                    Section(content: {
+                        TextField("Workout name", text: viewStore.binding(get: \.name, send: WorkoutPlanAction.nameChanged))
+                    }, header: { Text("Name") })
+
+                    Section(content: {
                     ForEachStore(self.store.scope(state: \.intervals, action: WorkoutPlanAction.interval(id:action:))) { intervalStore in
                         IntervalRowView(intervalStore: intervalStore,
                                         onTap: { viewStore.send(.startEditInterval(id: $0.id)) },
                                         onCopy: { viewStore.send(.copyInterval($0)) })
+                        .padding(.vertical, 8)
                     }
                     .onDelete(perform: { viewStore.send(.removeIntervals(indices: $0)) })
                     .onMove(perform: { viewStore.send(.moveIntervals(fromOffsets: $0, toOffset: $1)) })
+                    },
+                            header: {
+                        Text("Intervals")
+                    })
                 }
+                .listStyle(InsetGroupedListStyle())
                 .navigationBarItems(
                     leading: EditButton(),
                     trailing: Button("Add") {
@@ -74,11 +85,11 @@ struct IntervalRowView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text(viewStore.state.name)
+                            .foregroundColor(.primary)
                         Spacer()
                         Button("Copy") {
                             onCopy(viewStore.state)
                         }
-                        .padding(.trailing)
                     }
                     HStack {
                         Text(durationTypeDescription(viewStore.state.finishType))

@@ -62,7 +62,7 @@ public struct IntervalFormView: View {
                 })
 
                 Section(content: {
-                    Toggle("Set pace range",
+                    Toggle("Set pace target",
                            isOn: viewStore.binding(get: { $0.paceRange != nil }, send: { IntervalAction.paceRange(enabled: $0 == true)
                     }))
 
@@ -73,14 +73,13 @@ public struct IntervalFormView: View {
                         WithViewStore(store.scope(state: \.to)) { viewStore in
                             TimePickerView(title: "To", viewStore: viewStore) { IntervalAction.paceRangeToChanged($0) }
                         }
-
                     })
                 }, header: {
                     Text("Pace")
                 })
 
                 Section(content: {
-                    Toggle("Set pulse range",
+                    Toggle("Set pulse target",
                            isOn: viewStore.binding(get: { $0.pulseRange != nil }, send: { IntervalAction.pulseRange(enabled: $0 == true)
                     }))
 
