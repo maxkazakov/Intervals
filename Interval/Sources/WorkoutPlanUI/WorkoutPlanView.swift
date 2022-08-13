@@ -26,7 +26,7 @@ public struct WorkoutPlanView: View {
                 List {
                     ForEachStore(self.store.scope(state: \.intervals, action: WorkoutPlanAction.interval(id:action:))) { intervalStore in
                         IntervalRowView(intervalStore: intervalStore,
-                                        onTap: { viewStore.send(.startEditInterval(id: $0)) },
+                                        onTap: { viewStore.send(.startEditInterval(id: $0.id)) },
                                         onCopy: { viewStore.send(.copyInterval($0)) })
                     }
                     .onDelete(perform: { viewStore.send(.removeIntervals(indices: $0)) })
@@ -40,17 +40,23 @@ public struct WorkoutPlanView: View {
                 )
                 .navigationTitle(viewStore.name)
             }
-            .sheet(item: viewStore.binding(get: \.editingInterval, send: { _ in WorkoutPlanAction.finishEditInterval }), content: { interval in
-                NavigationView {
-                    IntervalFormView(
-                        store: self.store.scope(
-                            state: { $0.intervals[id: interval.id]! },
-                            action: { WorkoutPlanAction.interval(id: interval.id, action: $0) })
-                    )
-                        .navigationBarTitle(viewStore.state.name)
-                }
-                .navigationViewStyle(.stack)
-            })
+            .sheet(
+                isPresented: viewStore.binding(get: { $0.editingIntervalId != nil }, send: { _ in WorkoutPlanAction.finishEditInterval }),
+                content: {
+                    if let editingIntervalId = viewStore.state.editingIntervalId {
+                        NavigationView {
+                            IntervalFormView(
+                                store: self.store.scope(
+                                    state: { $0.intervals[id: editingIntervalId]! },
+                                    action: { WorkoutPlanAction.interval(id: editingIntervalId, action: $0) })
+                            )
+                            .navigationBarTitle(viewStore.state.name)
+                        }
+                        .navigationViewStyle(.stack)
+                    } else {
+                        EmptyView()
+                    }
+                })
         }
     }
 }
