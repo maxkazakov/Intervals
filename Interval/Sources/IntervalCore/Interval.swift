@@ -25,7 +25,7 @@ public struct Interval: Identifiable, Equatable {
         self.paceRange = paceRange
     }
 
-    public let id: Id
+    public var id: Id
     public var name: String
     public var dateCreated: Date
     public var finishType: IntervalFinishType

@@ -26,7 +26,8 @@ public struct WorkoutPlanView: View {
                 List {
                     ForEachStore(self.store.scope(state: \.intervals, action: WorkoutPlanAction.interval(id:action:))) { intervalStore in
                         IntervalRowView(intervalStore: intervalStore,
-                                        onTap: { viewStore.send(.startEditInterval(id: $0)) })
+                                        onTap: { viewStore.send(.startEditInterval(id: $0)) },
+                                        onCopy: { viewStore.send(.copyInterval($0)) })
                     }
                     .onDelete(perform: { viewStore.send(.removeIntervals(indices: $0)) })
                     .onMove(perform: { viewStore.send(.moveIntervals(fromOffsets: $0, toOffset: $1)) })
@@ -57,12 +58,26 @@ public struct WorkoutPlanView: View {
 struct IntervalRowView: View {
     let intervalStore: Store<Interval, IntervalAction>
     let onTap: (Interval) -> Void
+    let onCopy: (Interval) -> Void
 
     var body: some View {
         WithViewStore(intervalStore) { viewStore in
-            Button(action: { onTap(viewStore.state) }, label: {
+            Button(action: {
+                onTap(viewStore.state)
+            }, label: {
                 VStack(alignment: .leading) {
-                    Text(viewStore.state.name)
+                    HStack {
+                        Text(viewStore.state.name)
+                        Spacer()
+                    }
+
+                    HStack {
+                        Spacer()
+                        Button("Copy") {
+                            onCopy(viewStore.state)
+                        }
+                    }
+                    .padding(.horizontal)
                 }
             })
         }

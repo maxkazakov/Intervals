@@ -43,6 +43,8 @@ public enum WorkoutPlanAction {
 
     case startEditInterval(id: Interval)
     case finishEditInterval
+
+    case copyInterval(Interval)
 }
 
 public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutPlanEnvironment> { state, action, _ in
@@ -52,7 +54,7 @@ public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutP
         return .none
 
     case .addNewInterval:
-        let newInterval = Interval.make(with: "New interval", and: .byTappingButton)
+        let newInterval = Interval.make(with: "Interval", and: .byTappingButton)
         state.intervals.append(newInterval)
         return .none
 
@@ -70,6 +72,12 @@ public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutP
 
     case .finishEditInterval:
         state.editingInterval = nil
+        return .none
+
+    case let .copyInterval(interval):
+        var newInterval = interval
+        newInterval.id = .init()
+        state.intervals.append(newInterval)
         return .none
         
     case .interval:
