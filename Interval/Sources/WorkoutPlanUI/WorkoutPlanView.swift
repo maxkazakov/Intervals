@@ -71,21 +71,36 @@ struct IntervalRowView: View {
             Button(action: {
                 onTap(viewStore.state)
             }, label: {
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text(viewStore.state.name)
-                        Spacer()
-                    }
-
-                    HStack {
                         Spacer()
                         Button("Copy") {
                             onCopy(viewStore.state)
                         }
+                        .padding(.trailing)
                     }
-                    .padding(.horizontal)
+                    HStack {
+                        Text(durationTypeDescription(viewStore.state.finishType))
+                            .foregroundColor(.secondary)
+                            .font(.callout)
+                        Spacer()
+                    }
                 }
             })
+        }
+    }
+
+    func durationTypeDescription(_ durationType: IntervalFinishType) -> String {
+        switch durationType {
+        case .byTappingButton:
+            return "Button tap"
+
+        case let .byDistance(meters):
+            return "\(FormatDisplay.distance(meters: meters, outputUnit: .meters))"
+
+        case let .byDuration(seconds):
+            return "\(FormatDisplay.time(seconds))"
         }
     }
 }
