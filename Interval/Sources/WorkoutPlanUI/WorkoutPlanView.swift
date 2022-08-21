@@ -22,13 +22,12 @@ public struct WorkoutPlanView: View {
 
     public var body: some View {
         WithViewStore(store) { viewStore in
-            NavigationView {
-                List {
-                    Section(content: {
-                        TextField("Workout name", text: viewStore.binding(get: \.name, send: WorkoutPlanAction.nameChanged))
-                    }, header: { Text("Name") })
+            List {
+                Section(content: {
+                    TextField("Workout name", text: viewStore.binding(get: \.name, send: WorkoutPlanAction.nameChanged))
+                }, header: { Text("Name") })
 
-                    Section(content: {
+                Section(content: {
                     ForEachStore(self.store.scope(state: \.intervals, action: WorkoutPlanAction.interval(id:action:))) { intervalStore in
                         IntervalRowView(intervalStore: intervalStore,
                                         onTap: { viewStore.send(.startEditInterval(id: $0.id)) },
@@ -37,20 +36,23 @@ public struct WorkoutPlanView: View {
                     }
                     .onDelete(perform: { viewStore.send(.removeIntervals(indices: $0)) })
                     .onMove(perform: { viewStore.send(.moveIntervals(fromOffsets: $0, toOffset: $1)) })
-                    },
-                            header: {
-                        Text("Intervals")
-                    })
-                }
-                .listStyle(InsetGroupedListStyle())
-                .navigationBarItems(
-                    leading: EditButton(),
-                    trailing: Button("Add") {
-                        viewStore.send(.addNewInterval)
-                    }
-                )
-                .navigationTitle(viewStore.name)
+                },
+                        header: {
+                    Text("Intervals")
+                })
             }
+            .listStyle(InsetGroupedListStyle())
+            .navigationBarItems(
+                trailing:
+                    HStack {
+                        EditButton()
+                        Button("Add") {
+                            viewStore.send(.addNewInterval)
+                        }
+                    }
+            )
+            .navigationTitle(viewStore.name)
+
             .sheet(
                 isPresented: viewStore.binding(get: { $0.editingIntervalId != nil }, send: { _ in WorkoutPlanAction.finishEditInterval }),
                 content: {
@@ -73,6 +75,7 @@ public struct WorkoutPlanView: View {
 }
 
 struct IntervalRowView: View {
+
     let intervalStore: Store<Interval, IntervalAction>
     let onTap: (Interval) -> Void
     let onCopy: (Interval) -> Void

@@ -10,17 +10,20 @@ import IntervalCore
 import ComposableArchitecture
 import IdentifiedCollections
 
-public struct WorkoutPlan: Equatable {
+public struct WorkoutPlan: Identifiable, Equatable {
+    public var id: UUID
     public var name: String
     public var intervals: IdentifiedArrayOf<Interval> = []
     public var editingIntervalId: Interval.Id?
 
-    public init(name: String, intervals: IdentifiedArrayOf<Interval>) {
+    public init(id: UUID, name: String, intervals: IdentifiedArrayOf<Interval>) {
+        self.id = id
         self.name = name
         self.intervals = intervals
     }
 
     public static let `default` = WorkoutPlan(
+        id: UUID(uuidString: "DEADBEEF-DEAD-DEAD-DEAD-DEADDEAFBEEF")!, 
         name: "Workout Plan 1",
         intervals: [
             .make(with: "Warm up", and: .byDuration(seconds: 60 * 5)),
