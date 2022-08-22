@@ -23,8 +23,8 @@ public struct WorkoutPlan: Identifiable, Equatable {
     }
 
     public static let `default` = WorkoutPlan(
-        id: UUID(uuidString: "DEADBEEF-DEAD-DEAD-DEAD-DEADDEAFBEEF")!, 
-        name: "Workout Plan 1",
+        id: UUID(uuidString: "DEADBEEF-DEAD-DEAD-DEAD-DEADDEAFBEEF")!,
+        name: "Workout plan 1",
         intervals: [
             .make(with: "Warm up", and: .byDuration(seconds: 60 * 5)),
             .make(with: "Workout", and: .byDistance(meters: 1000))
@@ -36,7 +36,7 @@ public struct WorkoutPlanEnvironment {
     public init() {}
 }
 
-public enum WorkoutPlanAction {
+public enum WorkoutPlanAction: Equatable {
     case nameChanged(String)
     case addNewInterval
     case removeIntervals(indices: IndexSet)

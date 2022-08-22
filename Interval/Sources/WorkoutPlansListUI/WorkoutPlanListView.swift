@@ -34,13 +34,18 @@ public struct WorkoutPlanListView: View {
                                 })
                         }
                     })
+                    .onDelete(perform: { listViewStore.send(.tapRemoveWorkoutPlan(indices: $0)) })
                 }
                 .navigationBarItems(trailing: Button("Add", action: {
-                    
+                    listViewStore.send(.createNewWorkoutPlan)
                 }))
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationTitle("Workout plans")
             }
+            .alert(
+                self.store.scope(state: \.removingConfirmationDialog),
+                dismiss: .cancelRemoving
+            )
             .navigationViewStyle(.stack)
         }
     }
