@@ -6,17 +6,14 @@
 //
 
 import SwiftUI
-import IntervalList
-import IntervalCore
 import ComposableArchitecture
-import WorkoutPlanCore
-import IdentifiedCollections
+import WorkoutPlansListCore
 
 public struct AppState: Equatable {
-    public var workoutPlans: IdentifiedArrayOf<WorkoutPlan>
+    public var workoutPlans: WorkoutPlansList
 
     public init() {
-        self.workoutPlans = [.default, { var a = WorkoutPlan.default; a.id = UUID(); return a }()]
+        self.workoutPlans = .default
     }
 }
 
@@ -25,10 +22,10 @@ public struct AppEnvironment {
 }
 
 public enum AppAction {
-    case workoutPlan(id: UUID, action: WorkoutPlanAction)
+    case workoutPlanList(WorkoutPlansListAction)
 }
 
 public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
-    workoutPlanReducer.forEach(state: \.workoutPlans, action: /AppAction.workoutPlan, environment: { _ in WorkoutPlanEnvironment() })
+    workoutPlansListReducer.pullback(state: \.workoutPlans, action: /AppAction.workoutPlanList, environment: { _ in WorkoutPlansListEnvironment() })
 )
 .debug()

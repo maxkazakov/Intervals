@@ -27,6 +27,12 @@ let package = Package(
         .library(
             name: "WorkoutPlanUI",
             targets: ["WorkoutPlanUI"]),
+        .library(
+            name: "WorkoutPlansListCore",
+            targets: ["WorkoutPlansListCore"]),
+        .library(
+            name: "WorkoutPlansListUI",
+            targets: ["WorkoutPlansListUI"]),
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.39.0"),
@@ -35,7 +41,7 @@ let package = Package(
         .target(
             name: "AppCore",
             dependencies: [
-                "WorkoutPlanCore",
+                "WorkoutPlansListCore",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
@@ -43,7 +49,7 @@ let package = Package(
             name: "AppUI",
             dependencies: [
                 "AppCore",
-                "WorkoutPlanUI",
+                "WorkoutPlansListUI",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
@@ -69,6 +75,19 @@ let package = Package(
             dependencies: [
                 "IntervalUI",
                 "WorkoutPlanCore"
+            ]
+        ),
+        .target(
+            name: "WorkoutPlansListCore",
+            dependencies: [
+                "WorkoutPlanCore"
+            ]
+        ),
+        .target(
+            name: "WorkoutPlansListUI",
+            dependencies: [
+                "WorkoutPlansListCore",
+                "WorkoutPlanUI"
             ]
         ),
         .testTarget(
