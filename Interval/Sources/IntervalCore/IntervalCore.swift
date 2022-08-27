@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 public enum IntervalAction: Equatable {
     case nameChanged(String)
-    case finishTypeChanged(IntervalFinishType)
+    case finishTypeChanged(FinishType)
     case durationChanged(seconds: Int)
     case distanceChanged(meters: Double)
 
@@ -21,6 +21,8 @@ public enum IntervalAction: Equatable {
     case pulseRange(enabled: Bool)
     case pulseRangeFromChanged(Int)
     case pulseRangeToChanged(Int)
+
+    case repeatCountChanged(Int)
 }
 
 public struct IntervalEnvironment {
@@ -79,6 +81,10 @@ public let intervalReducer = Reducer<Interval, IntervalAction, IntervalEnvironme
 
     case let .pulseRangeToChanged(pulse):
         state.pulseRange = min(pulse, state.pulseRange!.lowerBound)...pulse
+        return .none
+
+    case let .repeatCountChanged(repeatCount):
+        state.repeatCount = repeatCount
         return .none
     }
 }

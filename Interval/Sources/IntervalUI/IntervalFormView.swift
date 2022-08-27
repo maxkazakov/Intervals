@@ -29,34 +29,38 @@ public struct IntervalFormView: View {
                             send: { IntervalAction.finishTypeChanged($0.finishType) }
                         ),
                         content: {
-                            ForEach(IntervalFinishType.allCases.map(ViewFinishType.init(finishType:))) { type in
+                            ForEach(FinishType.allCases.map(ViewFinishType.init(finishType:))) { type in
                                 Text(type.description)
                                     .tag(type)
                             }
                         })
 
                     SwitchStore(self.store.scope(state: \.finishType)) {
-                        CaseLet(state: /IntervalFinishType.byDistance,
+                        CaseLet(state: /FinishType.byDistance,
                                 then: { (store: Store<Double, IntervalAction>) in
                             WithViewStore(store) { viewStore in
                                 DistancePickerView(viewStore: viewStore)
                             }
                         })
 
-                        CaseLet(state: /IntervalFinishType.byDuration,
+                        CaseLet(state: /FinishType.byDuration,
                                 then: { (store: Store<Int, IntervalAction>) in
                             WithViewStore(store) { viewStore in
                                 TimePickerView(title: "Time", viewStore: viewStore) { IntervalAction.durationChanged(seconds: $0) }
                             }
                         })
 
-                        CaseLet(state: /IntervalFinishType.byTappingButton,
+                        CaseLet(state: /FinishType.byTappingButton,
                                 then: { (store: Store<Void, IntervalAction>) in
                             WithViewStore(store) { viewStore in
                                 EmptyView()
                             }
                         })
                     }
+                    
+                    Stepper(value: viewStore.binding(get: \.repeatCount, send: IntervalAction.repeatCountChanged),
+                                 in: 1...100,
+                                 label: { HStack { Text("Repeat "); Spacer(); Text("\(viewStore.repeatCount)").bold() } })
                 }, header: {
                     Text("Duration")
                 })
@@ -102,7 +106,7 @@ public struct IntervalFormView: View {
 }
 
 struct ViewFinishType: Identifiable, Hashable {
-    let finishType: IntervalFinishType
+    let finishType: FinishType
 
     var id: Int {
         switch finishType {

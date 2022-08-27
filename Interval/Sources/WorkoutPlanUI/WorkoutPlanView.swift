@@ -52,9 +52,8 @@ public struct WorkoutPlanView: View {
                     }
             )
             .navigationTitle(viewStore.name)
-
             .sheet(
-                isPresented: viewStore.binding(get: { $0.editingIntervalId != nil }, send: { _ in WorkoutPlanAction.finishEditInterval }),
+                isPresented: viewStore.binding(get: { $0.editingIntervalId != nil }, send: WorkoutPlanAction.finishEditInterval),
                 content: {
                     IfLetStore(self.store.scope(state: \.editingIntervalId), then: { editingIdStore in
                         WithViewStore(editingIdStore) { editingIdViewStore in
@@ -105,7 +104,7 @@ struct IntervalRowView: View {
         }
     }
 
-    func durationTypeDescription(_ durationType: IntervalFinishType) -> String {
+    func durationTypeDescription(_ durationType: FinishType) -> String {
         switch durationType {
         case .byTappingButton:
             return "Button tap"
