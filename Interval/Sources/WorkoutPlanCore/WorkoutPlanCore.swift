@@ -78,9 +78,13 @@ public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutP
         return .none
 
     case let .copyInterval(interval):
+        guard let idx = state.intervals.index(id: interval.id) else {
+            return .none
+        }
         var newInterval = interval
         newInterval.id = .init()
-        state.intervals.append(newInterval)
+        newInterval.name = interval.name + " copy"
+        state.intervals.insert(newInterval, at: idx + 1)
         return .none
         
     case .interval:
