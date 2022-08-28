@@ -19,11 +19,12 @@ public struct IntervalFormView: View {
     public var body: some View {
         WithViewStore(self.store) { viewStore in
             Form {
-                TextField("Name", text: viewStore.binding(get: \.name, send: IntervalAction.nameChanged))
 
                 Section(content: {
+                    TextField("Name", text: viewStore.binding(get: \.name, send: IntervalAction.nameChanged))
+
                     Picker(
-                        "Finish type",
+                        "Duration",
                         selection: viewStore.binding(
                             get: { ViewFinishType(finishType: $0.finishType) },
                             send: { IntervalAction.finishTypeChanged($0.finishType) }
@@ -39,7 +40,7 @@ public struct IntervalFormView: View {
                         CaseLet(state: /FinishType.byDistance,
                                 then: { (store: Store<Double, IntervalAction>) in
                             WithViewStore(store) { viewStore in
-                                DistancePickerView(viewStore: viewStore)
+                                DistancePickerView(viewStore: viewStore) { IntervalAction.distanceChanged(meters: $0) }
                             }
                         })
 
@@ -57,12 +58,56 @@ public struct IntervalFormView: View {
                             }
                         })
                     }
-                    
+
                     Stepper(value: viewStore.binding(get: \.repeatCount, send: IntervalAction.repeatCountChanged),
                                  in: 1...100,
-                                 label: { HStack { Text("Repeat "); Spacer(); Text("\(viewStore.repeatCount)").bold() } })
+                                 label: { HStack { Text("Repeat "); Spacer(); Text("\(viewStore.repeatCount)") } })
                 }, header: {
-                    Text("Duration")
+                    Text("Interval settings")
+                })
+
+                Section(content: {
+                    Toggle("Set up recovery",
+                           isOn: viewStore.binding(get: { $0.recoveryInfo.isEnabled }, send: { IntervalAction.recoveryEnabledChanged($0)}))
+
+                    if viewStore.recoveryInfo.isEnabled {
+                        Picker(
+                            "Duration",
+                            selection: viewStore.binding(
+                                get: { ViewFinishType(finishType: $0.recoveryInfo.finishType) },
+                                send: { IntervalAction.recoveryFinishTypeChanged($0.finishType) }
+                            ),
+                            content: {
+                                ForEach(FinishType.allCases.map(ViewFinishType.init(finishType:))) { type in
+                                    Text(type.description).tag(type)
+                                }
+                            })
+
+                        SwitchStore(self.store.scope(state: \.recoveryInfo.finishType)) {
+                            CaseLet(state: /FinishType.byDistance,
+                                    then: { (store: Store<Double, IntervalAction>) in
+                                WithViewStore(store) { viewStore in
+                                    DistancePickerView(viewStore: viewStore) { IntervalAction.recoveryFinishTypeChanged(.byDistance(meters: $0)) }
+                                }
+                            })
+
+                            CaseLet(state: /FinishType.byDuration,
+                                    then: { (store: Store<Int, IntervalAction>) in
+                                WithViewStore(store) { viewStore in
+                                    TimePickerView(title: "Time", viewStore: viewStore) { IntervalAction.recoveryFinishTypeChanged(.byDuration(seconds: $0)) }
+                                }
+                            })
+
+                            CaseLet(state: /FinishType.byTappingButton,
+                                    then: { (store: Store<Void, IntervalAction>) in
+                                WithViewStore(store) { viewStore in
+                                    EmptyView()
+                                }
+                            })
+                        }
+                    }
+                }, header: {
+                    Text("Recovery settings")
                 })
 
                 Section(content: {
@@ -79,7 +124,7 @@ public struct IntervalFormView: View {
                         }
                     })
                 }, header: {
-                    Text("Pace")
+                    Text("Pace target")
                 })
 
                 Section(content: {
@@ -96,7 +141,7 @@ public struct IntervalFormView: View {
                         }
                     })
                 }, header: {
-                    Text("Pulse")
+                    Text("Pulse target")
                 })
             }
             .navigationTitle("Editing")
@@ -118,9 +163,9 @@ struct ViewFinishType: Identifiable, Hashable {
 
     var description: String {
         switch finishType {
-        case .byDuration: return "By duration"
-        case .byDistance: return "By distance"
-        case .byTappingButton: return "By tapping button"
+        case .byDuration: return "Timer"
+        case .byDistance: return "Distance"
+        case .byTappingButton: return "No limit"
         }
     }
 

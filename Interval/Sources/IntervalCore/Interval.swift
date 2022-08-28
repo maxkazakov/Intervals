@@ -10,10 +10,14 @@ public struct EntityId<Entity>: Hashable {
 
 public struct RecoveryInfo: Equatable {
     public var finishType: FinishType
+    public var isEnabled: Bool
 
-    public init(finishType: FinishType) {
+    public init(finishType: FinishType, isEnabled: Bool) {
         self.finishType = finishType
+        self.isEnabled = isEnabled
     }
+
+    public static let `default` = RecoveryInfo(finishType: .byDuration(seconds: 60), isEnabled: false)
 }
 
 public struct Interval: Identifiable, Equatable {
@@ -38,7 +42,7 @@ public struct Interval: Identifiable, Equatable {
     public var dateCreated: Date
     public var finishType: FinishType
 
-    public var recoveryInfo: RecoveryInfo? = nil
+    public var recoveryInfo: RecoveryInfo = .default
     public var repeatCount: Int = 1
 
     public var pulseRange: PulseRange? = nil

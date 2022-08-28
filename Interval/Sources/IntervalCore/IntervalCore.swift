@@ -14,6 +14,9 @@ public enum IntervalAction: Equatable {
     case durationChanged(seconds: Int)
     case distanceChanged(meters: Double)
 
+    case recoveryEnabledChanged(Bool)
+    case recoveryFinishTypeChanged(FinishType)
+
     case paceRange(enabled: Bool)
     case paceRangeFromChanged(Int)
     case paceRangeToChanged(Int)
@@ -85,6 +88,14 @@ public let intervalReducer = Reducer<Interval, IntervalAction, IntervalEnvironme
 
     case let .repeatCountChanged(repeatCount):
         state.repeatCount = repeatCount
+        return .none
+
+    case let .recoveryEnabledChanged(recoveryEnabled):
+        state.recoveryInfo.isEnabled = recoveryEnabled
+        return .none
+
+    case let .recoveryFinishTypeChanged(finishType):
+        state.recoveryInfo.finishType = finishType
         return .none
     }
 }

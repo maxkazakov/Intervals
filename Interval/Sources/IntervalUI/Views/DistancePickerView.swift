@@ -13,8 +13,11 @@ import IntervalCore
 struct DistancePickerView: View {
 
     let viewStore: ViewStore<Double, IntervalAction>
-    init(viewStore: ViewStore<Double, IntervalAction>) {
+    let actionFactory: (Double) -> IntervalAction
+
+    init(viewStore: ViewStore<Double, IntervalAction>, actionFactory: @escaping (Double) -> IntervalAction) {
         self.viewStore = viewStore
+        self.actionFactory = actionFactory
     }
 
     private let possibleDistanceIntegerValues = Array(0...100)
@@ -31,7 +34,7 @@ struct DistancePickerView: View {
                     let fractionIdx = possibleDistanceFractionalValues.firstIndex { Int(meters) % 1000 == $0  } ?? 0
                     return [integerIdx, fractionIdx]
                 }, send: {
-                    IntervalAction.distanceChanged(meters: Double(indicesToMeters(ids: $0)))
+                    actionFactory(Double(indicesToMeters(ids: $0)))
                 }),
                 dataFormatter: { format(ids: $0) }
             )

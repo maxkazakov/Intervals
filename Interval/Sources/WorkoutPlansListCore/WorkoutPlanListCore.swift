@@ -82,4 +82,3 @@ public let workoutPlansListReducer = Reducer<WorkoutPlansList, WorkoutPlansListA
         }
     }
 )
-    .debug()
