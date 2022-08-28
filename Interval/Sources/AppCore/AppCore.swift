@@ -14,7 +14,7 @@ public struct AppState: Equatable {
     public var workoutPlans: WorkoutPlansList
 
     public init() {
-        self.workoutPlans = .default
+        self.workoutPlans = .init(workoutPlans: [])
     }
 }
 

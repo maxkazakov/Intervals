@@ -37,6 +37,21 @@ public struct WorkoutPlansList: Equatable {
     public static let `default` = WorkoutPlansList(workoutPlans: [.default])
 }
 
+extension Array where Element == WorkoutPlan {
+    public static let predefinedWorkouts = [
+        WorkoutPlan(id: UUID(), name: "Wokrout plan 1", intervals: IdentifiedArrayOf<Interval>(uniqueElements: [
+            Interval(id: Interval.Id(), name: "Interval 1", finishType: .byDuration(seconds: 60)),
+            Interval(id: Interval.Id(), name: "Interval 2", finishType: .byDistance(meters: 1000.0)),
+            Interval(id: Interval.Id(), name: "Interval 3", finishType: .byTappingButton)
+        ])),
+        WorkoutPlan(id: UUID(), name: "Wokrout plan 2", intervals: IdentifiedArrayOf<Interval>(uniqueElements: [
+            Interval(id: Interval.Id(), name: "Interval 1", finishType: .byDuration(seconds: 60 * 3)),
+            Interval(id: Interval.Id(), name: "Interval 2", finishType: .byDistance(meters: 2000.0)),
+            Interval(id: Interval.Id(), name: "Interval 3", finishType: .byTappingButton)
+        ]))
+    ]
+}
+
 public struct WorkoutPlansListEnvironment {
     var workoutPlansStorage: WorkoutPlansStorage
     var mainQueue: AnySchedulerOf<DispatchQueue>
@@ -113,8 +128,8 @@ public let workoutPlansListReducer = Reducer<WorkoutPlansList, WorkoutPlansListA
             state.loadingStatus = .loading
             return env.workoutPlansStorage.fetch()
                 .map { .plansLoadedFromDisk($0) }
-                .catch { _ in Just(.plansLoadedFromDisk([])) }
-//                .delay(for: 1, scheduler: env.mainQueue)
+                // If any error then setup predefined workout plans
+                .catch { _ in Just(.plansLoadedFromDisk(.predefinedWorkouts)) }
                 .receive(on: env.mainQueue)
                 .eraseToEffect()
 
