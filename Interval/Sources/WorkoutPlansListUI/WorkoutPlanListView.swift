@@ -21,7 +21,16 @@ public struct WorkoutPlanListView: View {
     public var body: some View {
         WithViewStore(store) { listViewStore in
             NavigationView {
+
                 List {
+                    if listViewStore.loadingStatus == .loading {
+                        HStack {
+                            Spacer()
+                            ProgressView().progressViewStyle(CircularProgressViewStyle())
+                            Spacer()
+                        }
+                    }
+
                     ForEachStore(store.scope(state: \.workoutPlans, action: WorkoutPlansListAction.workoutPlan(id:action:)), content: { workoutPlanStore in
                         WithViewStore(workoutPlanStore) { viewStore in
                             NavigationLink(
@@ -47,6 +56,7 @@ public struct WorkoutPlanListView: View {
                 dismiss: .cancelRemoving
             )
             .navigationViewStyle(.stack)
+            .onAppear { listViewStore.send(.initialLoading) }
         }
     }
 }

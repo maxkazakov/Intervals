@@ -19,8 +19,14 @@ import WorkoutPlansStorage
 
 public struct WorkoutPlansList: Equatable {
 
+    public enum LoadingStatus: Equatable {
+        case notLoaded
+        case loading
+        case loaded
+    }
+
     public var workoutPlans: IdentifiedArrayOf<WorkoutPlan>
-    public var isLoadingFromFile = false
+    public var loadingStatus: LoadingStatus = .notLoaded
     public var openedWorkoutPlanId: UUID?
     public var removingConfirmationDialog: AlertState<WorkoutPlansListAction>?
 
@@ -103,14 +109,17 @@ public let workoutPlansListReducer = Reducer<WorkoutPlansList, WorkoutPlansListA
             return .none
 
         case .initialLoading:
-            state.isLoadingFromFile = true
+            guard state.loadingStatus == .notLoaded else { return .none }
+            state.loadingStatus = .loading
             return env.workoutPlansStorage.fetch()
                 .map { .plansLoadedFromDisk($0) }
                 .catch { _ in Just(.plansLoadedFromDisk([])) }
+//                .delay(for: 1, scheduler: env.mainQueue)
+                .receive(on: env.mainQueue)
                 .eraseToEffect()
 
         case let .plansLoadedFromDisk(workoutPlans):
-            state.isLoadingFromFile = false
+            state.loadingStatus = .loaded
             state.workoutPlans = IdentifiedArrayOf<WorkoutPlan>(uniqueElements: workoutPlans)
             return .none
         }

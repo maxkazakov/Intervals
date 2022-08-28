@@ -22,7 +22,7 @@ public struct AppEnvironment {
     public init() {}
 }
 
-public enum AppAction {
+public enum AppAction {    
     case workoutPlanList(WorkoutPlansListAction)
 }
 
