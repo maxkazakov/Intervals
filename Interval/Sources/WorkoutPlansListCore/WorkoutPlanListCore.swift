@@ -32,6 +32,7 @@ public struct WorkoutPlansListEnvironment {
 
 public enum WorkoutPlansListAction: Equatable {
     case workoutPlan(id: UUID, action: WorkoutPlanAction)
+
     case setOpenedWorkoutPlan(id: UUID?)
     case createNewWorkoutPlan
     case tapRemoveWorkoutPlan(indices: IndexSet)

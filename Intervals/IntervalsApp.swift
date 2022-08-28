@@ -15,7 +15,7 @@ struct IntervalsApp: App {
     let store = Store(
         initialState: AppState(),
         reducer: appReducer,
-        environment: AppEnvironment()
+        environment: AppEnvironment(workoutPlansStorage: .live, mainQueue: .main)
     )
 
     var body: some Scene {
