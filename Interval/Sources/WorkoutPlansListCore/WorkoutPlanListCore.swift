@@ -6,16 +6,21 @@
 //
 
 import Foundation
+import Combine
+import ComposableArchitecture
+import IdentifiedCollections
 
 import SwiftUI
 import IntervalList
 import IntervalCore
-import ComposableArchitecture
 import WorkoutPlanCore
-import IdentifiedCollections
+import WorkoutPlansStorage
+
 
 public struct WorkoutPlansList: Equatable {
+
     public var workoutPlans: IdentifiedArrayOf<WorkoutPlan>
+    public var isLoadingFromFile = false
     public var openedWorkoutPlanId: UUID?
     public var removingConfirmationDialog: AlertState<WorkoutPlansListAction>?
 
@@ -27,7 +32,20 @@ public struct WorkoutPlansList: Equatable {
 }
 
 public struct WorkoutPlansListEnvironment {
-    public init() {}
+    var workoutPlansStorage: WorkoutPlansStorage
+    var mainQueue: AnySchedulerOf<DispatchQueue>
+
+    public init(
+        workoutPlansStorage: WorkoutPlansStorage,
+        mainQueue: AnySchedulerOf<DispatchQueue>
+    ) {
+        self.workoutPlansStorage = workoutPlansStorage
+        self.mainQueue = mainQueue
+    }
+}
+
+public extension WorkoutPlansListEnvironment {
+    static let live = WorkoutPlansListEnvironment(workoutPlansStorage: .live, mainQueue: .main)
 }
 
 public enum WorkoutPlansListAction: Equatable {
@@ -38,6 +56,9 @@ public enum WorkoutPlansListAction: Equatable {
     case tapRemoveWorkoutPlan(indices: IndexSet)
     case cancelRemoving
     case confirmRemoving(indices: IndexSet)
+
+    case initialLoading
+    case plansLoadedFromDisk([WorkoutPlan])
 }
 
 public let workoutPlansListReducer = Reducer<WorkoutPlansList, WorkoutPlansListAction, WorkoutPlansListEnvironment>.combine(
@@ -80,6 +101,25 @@ public let workoutPlansListReducer = Reducer<WorkoutPlansList, WorkoutPlansListA
             state.removingConfirmationDialog = nil
             indices.forEach { state.workoutPlans.remove(at: $0) }
             return .none
+
+        case .initialLoading:
+            state.isLoadingFromFile = true
+            return env.workoutPlansStorage.fetch()
+                .map { .plansLoadedFromDisk($0) }
+                .catch { _ in Just(.plansLoadedFromDisk([])) }
+                .eraseToEffect()
+
+        case let .plansLoadedFromDisk(workoutPlans):
+            state.isLoadingFromFile = false
+            state.workoutPlans = IdentifiedArrayOf<WorkoutPlan>(uniqueElements: workoutPlans)
+            return .none
         }
-    }
+    },
+    workoutPlansListSaveReducer
 )
+
+let workoutPlansListSaveReducer = Reducer<WorkoutPlansList, WorkoutPlansListAction, WorkoutPlansListEnvironment> {  state, action, env in
+    return env.workoutPlansStorage.store(state.workoutPlans.elements)
+        .throttle(for: 1, scheduler: env.mainQueue, latest: true)
+        .fireAndForget()
+}

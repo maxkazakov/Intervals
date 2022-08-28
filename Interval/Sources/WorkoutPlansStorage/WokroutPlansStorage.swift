@@ -8,27 +8,33 @@
 import WorkoutPlanCore
 import IntervalCore
 import ComposableArchitecture
+import Combine
 
 public struct WorkoutPlansStorage {
-    public init(fetch: @escaping () -> Effect<IdentifiedArrayOf<WorkoutPlan>, Error>, store: @escaping (IdentifiedArrayOf<WorkoutPlan>) -> Effect<Never, Never>) {
+    public init(
+        fetch: @escaping () -> Effect<[WorkoutPlan], Error>,
+        store: @escaping ([WorkoutPlan]) -> Effect<Never, Never>
+    ) {
         self.fetch = fetch
         self.store = store
     }
 
-    public var fetch: () -> Effect<IdentifiedArrayOf<WorkoutPlan>, Error>
-    public var store: (IdentifiedArrayOf<WorkoutPlan>) -> Effect<Never, Never>
+    public var fetch: () -> Effect<[WorkoutPlan], Error>
+    public var store: ([WorkoutPlan]) -> Effect<Never, Never>
+
+    public struct Failure: Error, Equatable {}
 }
 
 extension WorkoutPlansStorage {
     public static let live = WorkoutPlansStorage(
         fetch: {
-            Effect<IdentifiedArrayOf<WorkoutPlan>, Error>.catching {
+            .catching {
                 let data = try Data(contentsOf: fileUrl)
                 let dto = try JSONDecoder().decode([WorkoutPlanDTO].self, from: data)
                 let workoutPlans = dto.map {
                     WorkoutPlan(id: $0.id, name: $0.name, intervals: [])
                 }
-                return .init(uniqueElements: workoutPlans)
+                return workoutPlans
             }
             .subscribe(on: backgroundQueue.eraseToAnyScheduler())
             .eraseToEffect()
@@ -52,8 +58,6 @@ extension WorkoutPlansStorage {
         ).appendingPathComponent(filename)
     }
 }
-
-
 
 struct WorkoutPlanDTO: Codable {
     internal init(version: Int = 1, id: UUID, name: String) {

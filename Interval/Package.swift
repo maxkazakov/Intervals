@@ -45,7 +45,6 @@ let package = Package(
             name: "AppCore",
             dependencies: [
                 "WorkoutPlansListCore",
-                "WorkoutPlansStorage",
                 .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
@@ -82,7 +81,8 @@ let package = Package(
         .target(
             name: "WorkoutPlansListCore",
             dependencies: [
-                "WorkoutPlanCore"
+                "WorkoutPlanCore",
+                "WorkoutPlansStorage",
             ]
         ),
         .target(
@@ -95,7 +95,7 @@ let package = Package(
         .target(
             name: "WorkoutPlansStorage",
             dependencies: [
-                "WorkoutPlansListCore",
+                "WorkoutPlanCore",
                 "IntervalCore"
             ]
         ),
