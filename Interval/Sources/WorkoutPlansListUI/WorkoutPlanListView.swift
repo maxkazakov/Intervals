@@ -56,7 +56,13 @@ public struct WorkoutPlanRow: View {
 
     public var body: some View {
         WithViewStore(store) { viewStore in
-            Text(viewStore.name)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(viewStore.name)
+                Text(viewStore.intervals.map { $0.durationDescription }.joined(separator: "\n"))
+                    .foregroundColor(.secondary)
+                    .font(.callout)
+            }
+            .padding(.vertical, 8)
         }
     }
 }

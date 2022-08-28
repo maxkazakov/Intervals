@@ -42,15 +42,14 @@ let package = Package(
             name: "AppCore",
             dependencies: [
                 "WorkoutPlansListCore",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+//                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
             ]
         ),
         .target(
             name: "AppUI",
             dependencies: [
                 "AppCore",
-                "WorkoutPlansListUI",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+                "WorkoutPlansListUI"
             ]
         ),
         .target(
@@ -60,8 +59,7 @@ let package = Package(
         .target(
             name: "IntervalUI",
             dependencies: [
-                "IntervalCore",
-                .product(name: "ComposableArchitecture", package: "swift-composable-architecture")
+                "IntervalCore"
             ]
         ),
         .target(

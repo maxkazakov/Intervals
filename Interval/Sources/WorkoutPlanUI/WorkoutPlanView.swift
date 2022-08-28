@@ -94,7 +94,7 @@ struct IntervalRowView: View {
                         }
                     }
                     HStack {
-                        Text(durationTypeDescription(viewStore.state))
+                        Text(viewStore.state.durationDescription)
                             .foregroundColor(.secondary)
                             .font(.callout)
                         Spacer()
@@ -102,63 +102,5 @@ struct IntervalRowView: View {
                 }
             })
         }
-    }
-
-    func durationTypeDescription(_ interval: Interval) -> String {
-        func recoveryInfo(_ recovery: RecoveryInfo) -> String {
-            guard recovery.isEnabled else {
-                return ""
-            }
-            switch recovery.finishType {
-            case .byTappingButton:
-                return "No limit"
-
-            case let .byDistance(meters):
-                return "\(FormatDisplay.distance(meters: meters, outputUnit: .meters))"
-
-            case let .byDuration(seconds):
-                return "\(FormatDisplay.time(seconds))"
-            }
-        }
-
-        func repeatInfo( _ repeatCount: Int) -> String {
-            guard interval.repeatCount > 1 else {
-                return ""
-            }
-            return "\(interval.repeatCount)"
-        }
-
-        let recoveryString = recoveryInfo(interval.recoveryInfo)
-        let repeatString = repeatInfo(interval.repeatCount)
-
-        switch interval.finishType {
-        case .byTappingButton:
-            return "No limit"
-                .applyRecovery(recoveryString)
-                .applyRepeatCount(repeatString)
-
-        case let .byDistance(meters):
-            return "\(FormatDisplay.distance(meters: meters, outputUnit: .meters))"
-                .applyRecovery(recoveryString)
-                .applyRepeatCount(repeatString)
-
-
-        case let .byDuration(seconds):
-            return "\(FormatDisplay.time(seconds))"
-                .applyRecovery(recoveryString)
-                .applyRepeatCount(repeatString)
-        }
-    }
-}
-
-private extension String {
-    func applyRecovery(_ recovery: String) -> String {
-        guard !recovery.isEmpty else { return self }
-        return  "\(self) + \(recovery) recovery"
-    }
-
-    func applyRepeatCount(_ repeatCount: String) -> String {
-        guard !repeatCount.isEmpty else { return self }
-        return "\(repeatCount) x (" + self + ")"
     }
 }
