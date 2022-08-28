@@ -75,19 +75,12 @@ public enum FinishType: CaseIterable, Equatable {
 
 public typealias PulseRange = ClosedRange<Int>
 extension PulseRange {
-    public static let `default` = 140...160
+    public static let defaultPulse = 140...160
 }
 
+public typealias PaceRange = ClosedRange<Int>
 
 /// meters per sec
-public struct PaceRange: Codable, Hashable {
-    public init(from: Int, to: Int) {
-        self.from = from
-        self.to = to
-    }
-
-    public var from: Int
-    public var to: Int
-
-    public static let `default` = PaceRange(from: 60 * 5, to: 60 * 7)
+extension PaceRange {
+    public static let defaultPace = 60 * 5...60 * 7
 }

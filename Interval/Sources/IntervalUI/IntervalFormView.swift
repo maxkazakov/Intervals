@@ -116,10 +116,10 @@ public struct IntervalFormView: View {
                     }))
 
                     IfLetStore(self.store.scope(state: \.paceRange), then: { store in
-                        WithViewStore(store.scope(state: \.from)) { viewStore in
+                        WithViewStore(store.scope(state: \.lowerBound)) { viewStore in
                             TimePickerView(title: "From", viewStore: viewStore) { IntervalAction.paceRangeFromChanged($0) }
                         }
-                        WithViewStore(store.scope(state: \.to)) { viewStore in
+                        WithViewStore(store.scope(state: \.upperBound)) { viewStore in
                             TimePickerView(title: "To", viewStore: viewStore) { IntervalAction.paceRangeToChanged($0) }
                         }
                     })

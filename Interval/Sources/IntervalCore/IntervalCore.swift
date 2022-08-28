@@ -48,31 +48,23 @@ public let intervalReducer = Reducer<Interval, IntervalAction, IntervalEnvironme
         return .none
     case let .paceRange(enabled):
         if enabled {
-            state.paceRange = PaceRange.default
+            state.paceRange = PaceRange.defaultPace
         } else {
             state.paceRange = nil
         }
         return .none
+        
     case let .paceRangeFromChanged(seconds):
-        guard var paceRange = state.paceRange else {
-            return .none
-        }
-        paceRange.from = seconds
-        paceRange.to = max(seconds, paceRange.to)
-        state.paceRange = paceRange
+        state.paceRange = seconds...max(seconds, state.paceRange!.upperBound)
         return .none
+
     case let .paceRangeToChanged(seconds):
-        guard var paceRange = state.paceRange else {
-            return .none
-        }
-        paceRange.to = seconds
-        paceRange.from = min(seconds, paceRange.from)
-        state.paceRange = paceRange
+        state.paceRange = min(seconds, state.paceRange!.lowerBound)...seconds
         return .none
 
     case let .pulseRange(enabled):
         if enabled {
-            state.pulseRange = PulseRange.default
+            state.pulseRange = PulseRange.defaultPulse
         } else {
             state.pulseRange = nil
         }

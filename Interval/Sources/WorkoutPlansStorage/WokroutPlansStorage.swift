@@ -60,7 +60,7 @@ extension WorkoutPlansStorage {
 }
 
 struct WorkoutPlanDTO: Codable {
-    internal init(version: Int = 1, id: UUID, name: String) {
+    init(version: Int = 1, id: UUID, name: String) {
         self.version = version
         self.id = id
         self.name = name
@@ -70,3 +70,10 @@ struct WorkoutPlanDTO: Codable {
     var id: UUID
     var name: String
 }
+
+//struct IntervalDTO: Codable {
+//    var version = 1
+//    var id: UUID
+//    var name: String
+//    var dateCreated: Date
+//}
