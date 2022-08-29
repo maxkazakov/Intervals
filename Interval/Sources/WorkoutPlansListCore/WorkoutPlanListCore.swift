@@ -143,7 +143,10 @@ public let workoutPlansListReducer = Reducer<WorkoutPlansList, WorkoutPlansListA
 )
 
 let workoutPlansListSaveReducer = Reducer<WorkoutPlansList, WorkoutPlansListAction, WorkoutPlansListEnvironment> {  state, action, env in
+    enum SaveToken {}
     return env.workoutPlansStorage.store(state.workoutPlans.elements)
-        .throttle(for: 1, scheduler: env.mainQueue, latest: true)
+//        .throttle(id: SaveToken.self, for: 1.0, scheduler: env.mainQueue, latest: true)
+        // I would like to use throttle but it invokes receive() right away. Apparently to collect all available elements
+        .debounce(id: SaveToken.self, for: 0.5, scheduler: env.mainQueue)
         .fireAndForget()
 }

@@ -84,9 +84,7 @@ extension WorkoutPlansStorage {
     private static let backgroundQueue = DispatchQueue(label: "WorkoutPlansStorage")
     private static let filename = "workoutPlans.json"
     private static var fileUrl: URL {
-        URL(
-            fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
-        ).appendingPathComponent(filename)
+        URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]).appendingPathComponent(filename)
     }
 }
 
