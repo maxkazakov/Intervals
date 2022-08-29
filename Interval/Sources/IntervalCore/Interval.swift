@@ -5,7 +5,7 @@ public struct EntityId<Entity>: Hashable {
         self.value = value
     }
 
-    private let value: UUID
+    public let value: UUID
 }
 
 public struct RecoveryInfo: Equatable {
@@ -21,21 +21,18 @@ public struct RecoveryInfo: Equatable {
 }
 
 public struct Interval: Identifiable, Equatable {
-    public typealias Id = EntityId<Interval>
-
-    public init(id: Id,
-                name: String,
-                dateCreated: Date = Date(),
-                finishType: FinishType,
-                pulseRange: PulseRange? = nil,
-                paceRange: PaceRange? = nil) {
+    public init(id: Interval.Id, name: String, dateCreated: Date = Date(), finishType: FinishType, recoveryInfo: RecoveryInfo = .default, repeatCount: Int = 1, pulseRange: PulseRange? = nil, paceRange: PaceRange? = nil) {
         self.id = id
         self.name = name
         self.dateCreated = dateCreated
         self.finishType = finishType
+        self.recoveryInfo = recoveryInfo
+        self.repeatCount = repeatCount
         self.pulseRange = pulseRange
         self.paceRange = paceRange
     }
+
+    public typealias Id = EntityId<Interval>
 
     public var id: Id
     public var name: String
