@@ -9,6 +9,7 @@ import WorkoutPlanCore
 import IntervalCore
 import ComposableArchitecture
 import Combine
+import Foundation
 
 public struct WorkoutPlansStorage {
     public init(
@@ -36,7 +37,6 @@ extension WorkoutPlansStorage {
                         Interval(
                             id: Interval.Id($0.id),
                             name: $0.name,
-                            dateCreated: $0.dateCreated,
                             finishType: $0.finishType.wrappedValue,
                             recoveryInfo: RecoveryInfo(finishType: $0.recoveryInfo.finishType.wrappedValue,
                                                        isEnabled: $0.recoveryInfo.isEnabled),
@@ -61,7 +61,6 @@ extension WorkoutPlansStorage {
                                 IntervalDTO(
                                     id: interval.id.value,
                                     name: interval.name,
-                                    dateCreated: interval.dateCreated,
                                     repeatCount: interval.repeatCount,
                                     pulseRange: interval.pulseRange,
                                     paceRange: interval.paceRange,
@@ -99,7 +98,6 @@ struct IntervalDTO: Codable {
     var version = 1
     var id: UUID
     var name: String
-    var dateCreated: Date
     var repeatCount: Int
     var pulseRange: PulseRange?
     var paceRange: PaceRange?

@@ -99,9 +99,24 @@ let package = Package(
                 "IntervalCore"
             ]
         ),
+
+        
+        .target(
+            name: "TestHelpers"
+        ),
         .testTarget(
             name: "IntervalCoreTests",
             dependencies: ["IntervalCore"]
+        ),
+        .testTarget(
+            name: "WorkoutPlanCoreTests",
+            dependencies: ["WorkoutPlanCore",
+                           "TestHelpers"]
+        ),
+        .testTarget(
+            name: "WorkoutPlansListCoreTests",
+            dependencies: ["WorkoutPlansListCore",
+                           "TestHelpers"]
         ),
     ]
 )

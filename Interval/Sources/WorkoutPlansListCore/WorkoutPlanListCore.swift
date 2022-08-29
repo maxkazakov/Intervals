@@ -11,7 +11,6 @@ import ComposableArchitecture
 import IdentifiedCollections
 
 import SwiftUI
-import IntervalList
 import IntervalCore
 import WorkoutPlanCore
 import WorkoutPlansStorage
@@ -33,8 +32,6 @@ public struct WorkoutPlansList: Equatable {
     public init(workoutPlans: IdentifiedArrayOf<WorkoutPlan>) {
         self.workoutPlans = workoutPlans
     }
-
-    public static let `default` = WorkoutPlansList(workoutPlans: [.default])
 }
 
 extension Array where Element == WorkoutPlan {
@@ -55,18 +52,21 @@ extension Array where Element == WorkoutPlan {
 public struct WorkoutPlansListEnvironment {
     var workoutPlansStorage: WorkoutPlansStorage
     var mainQueue: AnySchedulerOf<DispatchQueue>
+    var uuid: () -> UUID
 
     public init(
         workoutPlansStorage: WorkoutPlansStorage,
-        mainQueue: AnySchedulerOf<DispatchQueue>
+        mainQueue: AnySchedulerOf<DispatchQueue>,
+        uuid: @escaping () -> UUID
     ) {
         self.workoutPlansStorage = workoutPlansStorage
         self.mainQueue = mainQueue
+        self.uuid = uuid
     }
 }
 
 public extension WorkoutPlansListEnvironment {
-    static let live = WorkoutPlansListEnvironment(workoutPlansStorage: .live, mainQueue: .main)
+    static let live = WorkoutPlansListEnvironment(workoutPlansStorage: .live, mainQueue: .main, uuid: UUID.init)
 }
 
 public enum WorkoutPlansListAction: Equatable {
@@ -83,8 +83,10 @@ public enum WorkoutPlansListAction: Equatable {
 }
 
 public let workoutPlansListReducer = Reducer<WorkoutPlansList, WorkoutPlansListAction, WorkoutPlansListEnvironment>.combine(
-    workoutPlanReducer.forEach(state: \.workoutPlans, action: /WorkoutPlansListAction.workoutPlan, environment: { _ in WorkoutPlanEnvironment() }),
+    workoutPlanReducer.forEach(state: \.workoutPlans, action: /WorkoutPlansListAction.workoutPlan, environment: { _ in WorkoutPlanEnvironment.live }),
     Reducer { state, action, env in
+        enum CancelID {}
+
         switch action {
         case let .setOpenedWorkoutPlan(id):
             state.openedWorkoutPlanId = id
@@ -92,14 +94,25 @@ public let workoutPlansListReducer = Reducer<WorkoutPlansList, WorkoutPlansListA
 
         case .createNewWorkoutPlan:
             let idx = state.workoutPlans.count + 1
-            let newPlanId = UUID()
-            var newPlan = WorkoutPlan.default
-            newPlan.id = newPlanId
-            newPlan.name = "Workout plan \(idx)"
+            let newPlanId = env.uuid()
+            let newPlan = WorkoutPlan(id: newPlanId,
+                        name: "Workout plan \(idx)",
+                        intervals: [
+                            Interval(id: .init(env.uuid()), name: "Warm up", finishType: .byDuration(seconds: 60 * 5)),
+                            Interval(id: .init(env.uuid()), name: "Workout", finishType: .byDistance(meters: 1000))
+                        ])
+
             state.workoutPlans.append(newPlan)
 
+            print("env: \(env)")
             return Effect(value: WorkoutPlansListAction.setOpenedWorkoutPlan(id: newPlanId))
-                .delay(for: 0.2, scheduler: RunLoop.main)
+                .delay(for: .milliseconds(150), scheduler: env.mainQueue)
+                .handleEvents(receiveOutput: { _ in
+                    print("--- receiveOutput \(Date().timeIntervalSince1970)")
+                }, receiveCompletion: { _ in
+                    print("--- receiveCompletion \(Date().timeIntervalSince1970)")
+                })
+//                .receive(on: env.mainQueue)
                 .eraseToEffect()
 
         case let .tapRemoveWorkoutPlan(indices):

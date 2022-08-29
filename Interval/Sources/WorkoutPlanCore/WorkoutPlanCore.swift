@@ -21,19 +21,18 @@ public struct WorkoutPlan: Identifiable, Equatable {
         self.name = name
         self.intervals = intervals
     }
-
-    public static let `default` = WorkoutPlan(
-        id: UUID(uuidString: "DEADBEEF-DEAD-DEAD-DEAD-DEADDEAFBEEF")!,
-        name: "Workout plan 1",
-        intervals: [
-            .make(with: "Warm up", and: .byDuration(seconds: 60 * 5)),
-            .make(with: "Workout", and: .byDistance(meters: 1000))
-        ]
-    )
 }
 
 public struct WorkoutPlanEnvironment {
-    public init() {}
+    var uuid: () -> UUID
+
+    public init(uuid: @escaping () -> UUID) {
+        self.uuid = uuid
+    }
+}
+
+public extension WorkoutPlanEnvironment {
+    static let live = WorkoutPlanEnvironment(uuid: UUID.init)
 }
 
 public enum WorkoutPlanAction: Equatable {
@@ -50,14 +49,14 @@ public enum WorkoutPlanAction: Equatable {
     case copyInterval(Interval)
 }
 
-public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutPlanEnvironment> { state, action, _ in
+public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutPlanEnvironment> { state, action, env in
     switch action {
     case let .nameChanged(newName):
         state.name = newName
         return .none
 
     case .addNewInterval:
-        let newInterval = Interval.make(with: "Interval", and: .byTappingButton)
+        let newInterval = Interval.init(id: Interval.ID(env.uuid()), name: "Interval", finishType: .byTappingButton)
         state.intervals.append(newInterval)
         return .none
 
@@ -82,7 +81,7 @@ public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutP
             return .none
         }
         var newInterval = interval
-        newInterval.id = .init()
+        newInterval.id = Interval.ID(env.uuid())
         newInterval.name = interval.name + " copy"
         state.intervals.insert(newInterval, at: idx + 1)
         return .none

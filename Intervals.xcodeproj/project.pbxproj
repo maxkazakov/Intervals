@@ -14,19 +14,10 @@
 		9BADAA892895648F00A32855 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9BADAA882895648F00A32855 /* Assets.xcassets */; };
 		9BADAA8C2895648F00A32855 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9BADAA8B2895648F00A32855 /* Preview Assets.xcassets */; };
 		9BADAA962895648F00A32855 /* IntervalsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BADAA952895648F00A32855 /* IntervalsTests.swift */; };
-		9BADAAA02895648F00A32855 /* IntervalsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BADAA9F2895648F00A32855 /* IntervalsUITests.swift */; };
-		9BADAAA22895648F00A32855 /* IntervalsUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BADAAA12895648F00A32855 /* IntervalsUITestsLaunchTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		9BADAA922895648F00A32855 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9BADAA792895648D00A32855 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 9BADAA802895648D00A32855;
-			remoteInfo = Intervals;
-		};
-		9BADAA9C2895648F00A32855 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9BADAA792895648D00A32855 /* Project object */;
 			proxyType = 1;
@@ -44,9 +35,6 @@
 		9BADAA8B2895648F00A32855 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		9BADAA912895648F00A32855 /* IntervalsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IntervalsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BADAA952895648F00A32855 /* IntervalsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntervalsTests.swift; sourceTree = "<group>"; };
-		9BADAA9B2895648F00A32855 /* IntervalsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IntervalsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9BADAA9F2895648F00A32855 /* IntervalsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntervalsUITests.swift; sourceTree = "<group>"; };
-		9BADAAA12895648F00A32855 /* IntervalsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntervalsUITestsLaunchTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,13 +48,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		9BADAA8E2895648F00A32855 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9BADAA982895648F00A32855 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -89,7 +70,6 @@
 				9B9852F228970D420037A321 /* Interval */,
 				9BADAA832895648D00A32855 /* Intervals */,
 				9BADAA942895648F00A32855 /* IntervalsTests */,
-				9BADAA9E2895648F00A32855 /* IntervalsUITests */,
 				9BADAA822895648D00A32855 /* Products */,
 				9B9852F3289716320037A321 /* Frameworks */,
 			);
@@ -100,7 +80,6 @@
 			children = (
 				9BADAA812895648D00A32855 /* Intervals.app */,
 				9BADAA912895648F00A32855 /* IntervalsTests.xctest */,
-				9BADAA9B2895648F00A32855 /* IntervalsUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -130,15 +109,6 @@
 				9BADAA952895648F00A32855 /* IntervalsTests.swift */,
 			);
 			path = IntervalsTests;
-			sourceTree = "<group>";
-		};
-		9BADAA9E2895648F00A32855 /* IntervalsUITests */ = {
-			isa = PBXGroup;
-			children = (
-				9BADAA9F2895648F00A32855 /* IntervalsUITests.swift */,
-				9BADAAA12895648F00A32855 /* IntervalsUITestsLaunchTests.swift */,
-			);
-			path = IntervalsUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -183,24 +153,6 @@
 			productReference = 9BADAA912895648F00A32855 /* IntervalsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		9BADAA9A2895648F00A32855 /* IntervalsUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 9BADAAAB2895648F00A32855 /* Build configuration list for PBXNativeTarget "IntervalsUITests" */;
-			buildPhases = (
-				9BADAA972895648F00A32855 /* Sources */,
-				9BADAA982895648F00A32855 /* Frameworks */,
-				9BADAA992895648F00A32855 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				9BADAA9D2895648F00A32855 /* PBXTargetDependency */,
-			);
-			name = IntervalsUITests;
-			productName = IntervalsUITests;
-			productReference = 9BADAA9B2895648F00A32855 /* IntervalsUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -216,11 +168,6 @@
 					};
 					9BADAA902895648F00A32855 = {
 						CreatedOnToolsVersion = 13.3.1;
-						TestTargetID = 9BADAA802895648D00A32855;
-					};
-					9BADAA9A2895648F00A32855 = {
-						CreatedOnToolsVersion = 13.3.1;
-						TestTargetID = 9BADAA802895648D00A32855;
 					};
 				};
 			};
@@ -239,7 +186,6 @@
 			targets = (
 				9BADAA802895648D00A32855 /* Intervals */,
 				9BADAA902895648F00A32855 /* IntervalsTests */,
-				9BADAA9A2895648F00A32855 /* IntervalsUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -255,13 +201,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		9BADAA8F2895648F00A32855 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9BADAA992895648F00A32855 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -288,15 +227,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9BADAA972895648F00A32855 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9BADAAA02895648F00A32855 /* IntervalsUITests.swift in Sources */,
-				9BADAAA22895648F00A32855 /* IntervalsUITestsLaunchTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -304,11 +234,6 @@
 			isa = PBXTargetDependency;
 			target = 9BADAA802895648D00A32855 /* Intervals */;
 			targetProxy = 9BADAA922895648F00A32855 /* PBXContainerItemProxy */;
-		};
-		9BADAA9D2895648F00A32855 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 9BADAA802895648D00A32855 /* Intervals */;
-			targetProxy = 9BADAA9C2895648F00A32855 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -489,7 +414,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U8743T8Z48;
@@ -501,7 +425,6 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Intervals.app/Intervals";
 			};
 			name = Debug;
 		};
@@ -509,7 +432,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U8743T8Z48;
@@ -521,43 +443,6 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Intervals.app/Intervals";
-			};
-			name = Release;
-		};
-		9BADAAAC2895648F00A32855 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = U8743T8Z48;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ru.maxkazakov.IntervalsUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Intervals;
-			};
-			name = Debug;
-		};
-		9BADAAAD2895648F00A32855 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = U8743T8Z48;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = ru.maxkazakov.IntervalsUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Intervals;
 			};
 			name = Release;
 		};
@@ -587,15 +472,6 @@
 			buildConfigurations = (
 				9BADAAA92895648F00A32855 /* Debug */,
 				9BADAAAA2895648F00A32855 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		9BADAAAB2895648F00A32855 /* Build configuration list for PBXNativeTarget "IntervalsUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9BADAAAC2895648F00A32855 /* Debug */,
-				9BADAAAD2895648F00A32855 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

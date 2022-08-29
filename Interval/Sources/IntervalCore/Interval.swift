@@ -21,10 +21,9 @@ public struct RecoveryInfo: Equatable {
 }
 
 public struct Interval: Identifiable, Equatable {
-    public init(id: Interval.Id, name: String, dateCreated: Date = Date(), finishType: FinishType, recoveryInfo: RecoveryInfo = .default, repeatCount: Int = 1, pulseRange: PulseRange? = nil, paceRange: PaceRange? = nil) {
+    public init(id: Interval.Id, name: String, finishType: FinishType, recoveryInfo: RecoveryInfo = .default, repeatCount: Int = 1, pulseRange: PulseRange? = nil, paceRange: PaceRange? = nil) {
         self.id = id
         self.name = name
-        self.dateCreated = dateCreated
         self.finishType = finishType
         self.recoveryInfo = recoveryInfo
         self.repeatCount = repeatCount
@@ -36,7 +35,6 @@ public struct Interval: Identifiable, Equatable {
 
     public var id: Id
     public var name: String
-    public var dateCreated: Date
     public var finishType: FinishType
 
     public var recoveryInfo: RecoveryInfo = .default
@@ -46,10 +44,10 @@ public struct Interval: Identifiable, Equatable {
     public var paceRange: PaceRange? = nil
 
 
-    public static let `default` = Interval(id: Interval.Id(), name: "", dateCreated: Date(), finishType: .byTappingButton)
+    public static let `default` = Interval(id: Interval.Id(), name: "", finishType: .byTappingButton)
 
     public static func make(with name: String, and finishType: FinishType) -> Interval {
-        Interval(id: Interval.Id(), name: name, dateCreated: Date(), finishType: finishType)
+        Interval(id: Interval.Id(), name: name, finishType: finishType)
     }
 }
 
