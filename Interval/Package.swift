@@ -38,7 +38,7 @@ let package = Package(
             targets: ["WorkoutPlansStorage"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.39.0"),
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.39.1"),
     ],
     targets: [
         .target(

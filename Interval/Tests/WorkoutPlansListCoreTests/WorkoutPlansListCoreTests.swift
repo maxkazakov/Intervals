@@ -53,18 +53,12 @@ final class WorkoutPlansListCoreTests: XCTestCase {
             state.workoutPlans.insert(workoutPlan, at: 0)
         }
 
-
         self.mainQueue.advance(by: .milliseconds(150))
 
         store.receive(.setOpenedWorkoutPlan(id: UUID(uuidString: "00000000-0000-0000-0000-000000000000")!)) { state in
             state.openedWorkoutPlanId = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
         }
 
-        // TODO: An effect caused by .createNewWorkoutPlan action is not completed and test failed.
-        // With this line it passes. Seems like Scheduler don't have enough time to run completion events.
         self.mainQueue.advance(by: .milliseconds(500))
-//        self.mainQueue.advance()
-
-        print("--- finish \(Date().timeIntervalSince1970)")
     }
 }

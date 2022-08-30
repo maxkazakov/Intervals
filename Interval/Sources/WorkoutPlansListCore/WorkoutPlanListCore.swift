@@ -104,15 +104,8 @@ public let workoutPlansListReducer = Reducer<WorkoutPlansList, WorkoutPlansListA
 
             state.workoutPlans.append(newPlan)
 
-            print("env: \(env)")
             return Effect(value: WorkoutPlansListAction.setOpenedWorkoutPlan(id: newPlanId))
                 .delay(for: .milliseconds(150), scheduler: env.mainQueue)
-                .handleEvents(receiveOutput: { _ in
-                    print("--- receiveOutput \(Date().timeIntervalSince1970)")
-                }, receiveCompletion: { _ in
-                    print("--- receiveCompletion \(Date().timeIntervalSince1970)")
-                })
-//                .receive(on: env.mainQueue)
                 .eraseToEffect()
 
         case let .tapRemoveWorkoutPlan(indices):
@@ -158,8 +151,6 @@ public let workoutPlansListReducer = Reducer<WorkoutPlansList, WorkoutPlansListA
 let workoutPlansListSaveReducer = Reducer<WorkoutPlansList, WorkoutPlansListAction, WorkoutPlansListEnvironment> {  state, action, env in
     enum SaveToken {}
     return env.workoutPlansStorage.store(state.workoutPlans.elements)
-//        .throttle(id: SaveToken.self, for: 1.0, scheduler: env.mainQueue, latest: true)
-        // I would like to use throttle but it invokes receive() right away. Apparently to collect all available elements
         .debounce(id: SaveToken.self, for: 0.5, scheduler: env.mainQueue)
         .fireAndForget()
 }
