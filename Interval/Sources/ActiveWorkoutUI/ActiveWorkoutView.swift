@@ -18,7 +18,8 @@ public struct ActiveWorkoutView: View {
 
     public var body: some View {
         WithViewStore(store) { viewStore in
-            Text("\(Self.timerFormat.string(from: viewStore.time)!)")
+            Text("\(formatMmSs(viewStore.time))")
+                .font(.system(.largeTitle))
         }
     }
 
@@ -29,4 +30,16 @@ public struct ActiveWorkoutView: View {
         formatter.zeroFormattingBehavior = [ .pad ] // Pad with
         return formatter
     }()
+
+    func formatMmSs(_ counter: Double) -> String {
+        let hours = Int(counter) / 60 / 60
+        let minutes = Int(counter) / 60 % 60
+        let seconds = Int(counter) % 60
+        let milliseconds = Int(counter * 1000) % 1000
+        if hours > 0 {
+            return String(format: "%02d:%02d:%02d:%03d", hours, minutes, seconds, milliseconds)
+        } else {
+            return String(format: "%02d:%02d:%03d", minutes, seconds, milliseconds)
+        }
+    }
 }

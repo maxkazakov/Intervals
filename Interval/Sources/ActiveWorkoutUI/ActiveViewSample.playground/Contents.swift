@@ -1,3 +1,4 @@
+
 import ComposableArchitecture
 import PlaygroundSupport
 import SwiftUI
@@ -13,7 +14,7 @@ let workoutPlan = ActiveWorkout(
         name: "Some",
         intervals: []
     ),
-    time: 12.3,
+    time: 3600 - 0.001,
     status: .initial
 )
 
@@ -27,7 +28,7 @@ PlaygroundPage.current.liveView = UIHostingController(
                     environment: environment
                 )
             )
-            .navigationTitle("Hello")
+            .navigationTitle("Workout")
         }
 )
 
