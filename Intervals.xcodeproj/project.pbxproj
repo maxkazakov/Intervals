@@ -35,6 +35,7 @@
 		9BADAA8B2895648F00A32855 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		9BADAA912895648F00A32855 /* IntervalsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IntervalsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BADAA952895648F00A32855 /* IntervalsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntervalsTests.swift; sourceTree = "<group>"; };
+		9BFDD69A28C3D2D200EFF8DE /* Samples.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Samples.playground; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +68,7 @@
 		9BADAA782895648D00A32855 = {
 			isa = PBXGroup;
 			children = (
+				9BFDD69A28C3D2D200EFF8DE /* Samples.playground */,
 				9B9852F228970D420037A321 /* Interval */,
 				9BADAA832895648D00A32855 /* Intervals */,
 				9BADAA942895648F00A32855 /* IntervalsTests */,

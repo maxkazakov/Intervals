@@ -18,7 +18,7 @@ public struct ActiveWorkoutView: View {
 
     public var body: some View {
         WithViewStore(store) { viewStore in
-            Text("Time: \(Self.timerFormat.string(from: viewStore.time)!)")
+            Text("\(Self.timerFormat.string(from: viewStore.time)!)")
         }
     }
 

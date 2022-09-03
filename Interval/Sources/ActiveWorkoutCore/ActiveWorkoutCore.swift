@@ -43,7 +43,7 @@ public enum ActiveWorkoutAction: Equatable {
     case stop
 }
 
-public let workoutPlanReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, ActiveWorkoutEnvironment> { state, action, env in
+public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, ActiveWorkoutEnvironment> { state, action, env in
     switch action {
     case .start:
         return .none
