@@ -65,10 +65,6 @@ public struct WorkoutPlansListEnvironment {
     }
 }
 
-public extension WorkoutPlansListEnvironment {
-    static let live = WorkoutPlansListEnvironment(workoutPlansStorage: .live, mainQueue: .main, uuid: UUID.init)
-}
-
 public enum WorkoutPlansListAction: Equatable {
     case workoutPlan(id: UUID, action: WorkoutPlanAction)
 
@@ -83,7 +79,9 @@ public enum WorkoutPlansListAction: Equatable {
 }
 
 public let workoutPlansListReducer = Reducer<WorkoutPlansList, WorkoutPlansListAction, WorkoutPlansListEnvironment>.combine(
-    workoutPlanReducer.forEach(state: \.workoutPlans, action: /WorkoutPlansListAction.workoutPlan, environment: { _ in WorkoutPlanEnvironment.live }),
+    workoutPlanReducer.forEach(state: \.workoutPlans,
+                               action: /WorkoutPlansListAction.workoutPlan,
+                               environment: { WorkoutPlanEnvironment(uuid: $0.uuid) }),
     Reducer { state, action, env in
         enum CancelID {}
 

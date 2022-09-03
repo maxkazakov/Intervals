@@ -31,10 +31,6 @@ public struct WorkoutPlanEnvironment {
     }
 }
 
-public extension WorkoutPlanEnvironment {
-    static let live = WorkoutPlanEnvironment(uuid: UUID.init)
-}
-
 public enum WorkoutPlanAction: Equatable {
     case nameChanged(String)
     case addNewInterval
@@ -47,6 +43,8 @@ public enum WorkoutPlanAction: Equatable {
     case finishEditInterval
 
     case copyInterval(Interval)
+
+    case startWorkout(WorkoutPlan)
 }
 
 public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutPlanEnvironment> { state, action, env in
@@ -84,6 +82,9 @@ public let workoutPlanReducer = Reducer<WorkoutPlan, WorkoutPlanAction, WorkoutP
         newInterval.id = Interval.ID(env.uuid())
         newInterval.name = interval.name + " copy"
         state.intervals.insert(newInterval, at: idx + 1)
+        return .none
+
+    case .startWorkout:
         return .none
         
     case .interval:

@@ -15,7 +15,7 @@ struct IntervalsApp: App {
     let store = Store(
         initialState: AppState(),
         reducer: appReducer,
-        environment: AppEnvironment()
+        environment: AppEnvironment(uuid: UUID.init)
     )
 
     var body: some Scene {

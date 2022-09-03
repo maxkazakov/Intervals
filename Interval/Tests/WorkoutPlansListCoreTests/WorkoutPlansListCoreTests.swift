@@ -61,4 +61,21 @@ final class WorkoutPlansListCoreTests: XCTestCase {
 
         self.mainQueue.advance(by: .milliseconds(500))
     }
+
+    @MainActor
+    func testImmediateDebounce() async {
+        enum Action { case tap }
+        let store = TestStore(
+            initialState: 0,
+            reducer: Reducer<Int, Action, Void> { state, action, _ in
+//                return .fireAndForget {
+//                }
+//                .debounce(id: 1, for: 1, scheduler: DispatchQueue.immediate)
+                return .none
+            },
+            environment: ()
+        )
+
+        await store.send(.tap)
+    }
 }

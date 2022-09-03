@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AppCore
+import ActiveWorkoutUI
 import WorkoutPlansListUI
 import ComposableArchitecture
 
@@ -19,7 +20,15 @@ public struct AppView: View {
     }
 
     public var body: some View {
-        WorkoutPlanListView(store: store.scope(state: \.workoutPlans, action: AppAction.workoutPlanList))
+        IfLetStore(
+            self.store.scope(state: \.activeWorkout, action: { .activeWorkoutAction($0) }),
+            then: {
+                ActiveWorkoutView(store: $0)
+            },
+            else: {
+                WorkoutPlanListView(store: store.scope(state: \.workoutPlans, action: AppAction.workoutPlanList))
+            }
+        )
     }
 }
 
