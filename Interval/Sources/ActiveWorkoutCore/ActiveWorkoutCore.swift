@@ -9,7 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 import WorkoutPlanCore
 
-public enum ActiveWorkoutStatus {
+public enum ActiveWorkoutStatus: Equatable {
     case initial
     case inProgress
     case paused
@@ -46,10 +46,13 @@ public enum ActiveWorkoutAction: Equatable {
 public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, ActiveWorkoutEnvironment> { state, action, env in
     switch action {
     case .start:
+        state.status = .inProgress
         return .none
     case .pause:
+        state.status = .paused
         return .none
     case .stop:
+        state.status = .paused
         return .none
     }
 }
