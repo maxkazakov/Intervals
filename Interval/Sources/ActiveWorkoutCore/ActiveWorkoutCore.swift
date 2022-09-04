@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import WorkoutPlanCore
+import IntervalCore
 
 public enum ActiveWorkoutStatus: Equatable {
     case initial
@@ -15,12 +16,34 @@ public enum ActiveWorkoutStatus: Equatable {
     case paused
 }
 
+public struct WorkoutIntervalStep: Equatable {
+    public init(id: UUID, name: String, finishType: FinishType, intervalId: Interval.Id) {
+        self.id = id
+        self.name = name
+        self.finishType = finishType
+        self.intervalId = intervalId
+    }
+
+    let id: UUID
+    public var name: String
+    let finishType: FinishType
+    let intervalId: Interval.Id
+}
+
 public struct ActiveWorkout: Identifiable, Equatable {
-    public init(id: UUID, workoutPlan: WorkoutPlan, time: TimeInterval = 0.0, status: ActiveWorkoutStatus = .initial) {
+    public init(id: UUID,
+                workoutPlan: WorkoutPlan,
+                time: TimeInterval = 0.0,
+                status: ActiveWorkoutStatus = .initial,
+                intervalSteps: [WorkoutIntervalStep],
+                currentIntervalStep: WorkoutIntervalStep?
+    ) {
         self.id = id
         self.workoutPlan = workoutPlan
         self.time = time
         self.status = status
+        self.intervalSteps = intervalSteps
+        self.currentIntervalStep = currentIntervalStep
     }
 
     public var id: UUID
@@ -28,6 +51,8 @@ public struct ActiveWorkout: Identifiable, Equatable {
     public var time: TimeInterval = 0.0
     public var lastTimeStarted = Date()
     public var status: ActiveWorkoutStatus
+    public var intervalSteps: [WorkoutIntervalStep]
+    public var currentIntervalStep: WorkoutIntervalStep?
 }
 
 public struct ActiveWorkoutEnvironment {

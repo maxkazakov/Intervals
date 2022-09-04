@@ -38,7 +38,7 @@ public struct ActiveWorkoutView: View {
                 .padding(.horizontal, 32)
 
                 VStack {
-                    Text(viewStore.state.workoutPlan.intervals.first?.name ?? "No name")
+                    Text(viewStore.currentIntervalStep?.name ?? "No name")
                         .font(.title2)
                     TimerView(viewModel: TimerViewModel(viewStore: viewStore))
                 }
@@ -102,7 +102,9 @@ struct ActiveWorkoutView_Previews: PreviewProvider {
                 id: UUID(),
                 workoutPlan: workoutPlan,
                 time: 0.0011,
-                status: .inProgress
+                status: .inProgress,
+                intervalSteps: [],
+                currentIntervalStep: nil
             ),
             reducer: activeWorkoutReducer,
             environment: ActiveWorkoutEnvironment(uuid: UUID.init)
