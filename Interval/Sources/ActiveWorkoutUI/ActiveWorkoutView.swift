@@ -23,8 +23,23 @@ public struct ActiveWorkoutView: View {
     public var body: some View {
         WithViewStore(store) { viewStore in
             ZStack {
+
+                ZStack {
+                    Circle()
+                        .trim(from: 0, to: 0.15)
+                        .stroke(style: StrokeStyle(lineWidth: 20, lineCap: .round))
+                        .fill(Color.black)
+                        .rotationEffect(.degrees(-90))
+
+                    Circle()
+                        .stroke(Color.black.opacity(0.1), lineWidth: 20)
+                        .rotationEffect(.degrees(-90))
+                }
+                .padding(.horizontal, 32)
+
                 VStack {
                     Text(viewStore.state.workoutPlan.intervals.first?.name ?? "No name")
+                        .font(.title2)
                     TimerView(viewModel: TimerViewModel(viewStore: viewStore))
                 }
 
