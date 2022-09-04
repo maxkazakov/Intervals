@@ -22,23 +22,41 @@ public struct ActiveWorkoutView: View {
     public var body: some View {
         WithViewStore(store) { viewStore in
             ZStack {
-                TimerView(viewModel: TimerViewModel(viewStore: viewStore))
+                VStack {
+                    Text(viewStore.state.workoutPlan.intervals.first?.name ?? "No name")
+                    TimerView(viewModel: TimerViewModel(viewStore: viewStore))
+                }
 
                 VStack {
-                    Spacer()
-                    StartStopButton(state: mapStatusToButton(viewStore.state.status),
-                                    onStart: { viewStore.send(.start) },
-                                    onPause: { viewStore.send(.pause) })
+                    if viewStore.state.status != .initial {
+                        HStack {
+                            StopButton(onStop: { viewStore.send(.stop) })
+                            Spacer()
+                            if let pauseButtonState = mapStatusToButton(viewStore.state.status) {
+                                PauseResumeButton(state: pauseButtonState,
+                                                  onStart: { viewStore.send(.start) },
+                                                  onPause: { viewStore.send(.pause) })
+                            }
+                        }
+                        Spacer()
+                    } else {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            StartButton(onStart: { viewStore.send(.start) })
+                            Spacer()
+                        }
+                    }
                 }
-                .padding()
+                .padding(.horizontal, 12)
             }
             .background(Color.yellow.ignoresSafeArea())
         }
     }
 
-    func mapStatusToButton(_ status: ActiveWorkoutStatus) -> StartStopButtonState {
+    func mapStatusToButton(_ status: ActiveWorkoutStatus) -> PauseResumeButtonState? {
         switch status {
-        case .initial: return .stopped
+        case .initial: return nil
         case .inProgress: return .playing
         case .paused: return .paused
         }
