@@ -55,6 +55,9 @@ let startWorkoutReducer = Reducer<AppState, AppAction, AppEnvironment>({ state, 
     case let .workoutPlanList(.workoutPlan(_, action: .startWorkout(workoutPlan))):
         state.activeWorkout = ActiveWorkout(id: env.uuid(), workoutPlan: workoutPlan)
         return .none
+    case .activeWorkoutAction(.stop):
+        state.activeWorkout = nil
+        return .none
     default:
         return .none
     }

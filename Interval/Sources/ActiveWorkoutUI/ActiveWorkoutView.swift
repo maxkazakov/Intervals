@@ -11,6 +11,7 @@ import ComposableArchitecture
 
 import ActiveWorkoutCore
 import WorkoutPlanCore
+import IntervalCore
 
 public struct ActiveWorkoutView: View {
     public init(store: Store<ActiveWorkout, ActiveWorkoutAction>) {
@@ -67,7 +68,17 @@ struct ActiveWorkoutView_Previews: PreviewProvider {
     static let workoutPlan = WorkoutPlan(
         id: UUID(),
         name: "Running",
-        intervals: []
+        intervals: [
+            Interval(
+                id: Interval.Id(),
+                name: "Running",
+                finishType: .byDuration(seconds: 60),
+                recoveryInfo: RecoveryInfo(finishType: .byTappingButton, isEnabled: false),
+                repeatCount: 2,
+                pulseRange: nil,
+                paceRange: nil
+            )
+        ]
     )
 
     static var previews: some View {
@@ -76,7 +87,7 @@ struct ActiveWorkoutView_Previews: PreviewProvider {
                 id: UUID(),
                 workoutPlan: workoutPlan,
                 time: 0.0011,
-                status: .initial
+                status: .inProgress
             ),
             reducer: activeWorkoutReducer,
             environment: ActiveWorkoutEnvironment(uuid: UUID.init)
