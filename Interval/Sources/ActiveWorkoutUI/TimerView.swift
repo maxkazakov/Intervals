@@ -31,13 +31,16 @@ struct TimerView: View {
     }
 }
 
+// Needed for displaying timer on UI. It may be expensive to handle milliseconds throught store
 class TimerViewModel: ObservableObject {
     @Published var time: TimeInterval = 0.0
+    private var accumulatedTime: TimeInterval = 0.0
+
     let viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>
 
     private var cancellableSet: Set<AnyCancellable> = []
     private var timer: AnyCancellable?
-    private var prevDate = Date()
+    private var lastTimeStarted = Date()
     private var currentState = ActiveWorkoutStatus.initial {
         didSet {
             guard oldValue != currentState else { return }
@@ -63,20 +66,21 @@ class TimerViewModel: ObservableObject {
     }
 
     func startTimer() {
-        prevDate = Date()
+        self.lastTimeStarted = viewStore.state.lastTimeStarted
+        self.accumulatedTime = viewStore.time
+
         timer = Timer
-            .publish(every: 0.1, on: .main, in: .common)
+            .publish(every: 0.1, tolerance: 0.1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
                 guard let self = self else { return }
-                let now = Date()
-                let diff = now.timeIntervalSince1970 - self.prevDate.timeIntervalSince1970
-                self.time += diff
-                self.prevDate = now
+                let diff = Date().timeIntervalSince1970 - self.lastTimeStarted.timeIntervalSince1970
+                self.time = self.accumulatedTime + diff
             }
     }
 
     func pauseTimer() {
+        self.time = viewStore.time
         timer?.cancel()
     }
 }

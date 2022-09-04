@@ -26,6 +26,7 @@ public struct ActiveWorkout: Identifiable, Equatable {
     public var id: UUID
     public let workoutPlan: WorkoutPlan
     public var time: TimeInterval = 0.0
+    public var lastTimeStarted = Date()
     public var status: ActiveWorkoutStatus
 }
 
@@ -46,12 +47,15 @@ public enum ActiveWorkoutAction: Equatable {
 public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, ActiveWorkoutEnvironment> { state, action, env in
     switch action {
     case .start:
+        state.lastTimeStarted = Date()
         state.status = .inProgress
         return .none
     case .pause:
+        state.time += Date().timeIntervalSince1970 - state.lastTimeStarted.timeIntervalSince1970
         state.status = .paused
         return .none
     case .stop:
+        state.time += Date().timeIntervalSince1970 - state.lastTimeStarted.timeIntervalSince1970
         state.status = .paused
         return .none
     }
