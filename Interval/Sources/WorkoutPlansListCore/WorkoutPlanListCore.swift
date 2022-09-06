@@ -45,6 +45,11 @@ extension Array where Element == WorkoutPlan {
             Interval(id: Interval.Id(), name: "Interval 1", finishType: .byDuration(seconds: 60 * 3)),
             Interval(id: Interval.Id(), name: "Interval 2", finishType: .byDistance(meters: 2000.0)),
             Interval(id: Interval.Id(), name: "Interval 3", finishType: .byTappingButton)
+        ])),
+        WorkoutPlan(id: UUID(), name: "only button taps", intervals: IdentifiedArrayOf<Interval>(uniqueElements: [
+            Interval(id: Interval.Id(), name: "Interval 1", finishType: .byTappingButton),
+            Interval(id: Interval.Id(), name: "Interval 2", finishType: .byTappingButton),
+            Interval(id: Interval.Id(), name: "Interval 3", finishType: .byTappingButton)
         ]))
     ]
 }

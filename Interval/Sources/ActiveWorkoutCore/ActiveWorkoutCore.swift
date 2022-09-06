@@ -26,8 +26,8 @@ public struct WorkoutIntervalStep: Equatable {
 
     let id: UUID
     public var name: String
-    let finishType: FinishType
-    let intervalId: Interval.Id
+    public let finishType: FinishType
+    public let intervalId: Interval.Id
 }
 
 public struct ActiveWorkout: Identifiable, Equatable {

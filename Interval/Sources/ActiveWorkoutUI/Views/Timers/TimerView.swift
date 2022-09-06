@@ -10,12 +10,20 @@ import Combine
 import ComposableArchitecture
 import ActiveWorkoutCore
 
-struct TimerView: View {
+struct TimerView<TextView: View>: View {
     @StateObject var viewModel: TimerViewModel
+    let textView: TextView
 
     var body: some View {
-        Text("\(formatMilliseconds(viewModel.time))")
-            .font(.system(.largeTitle))
+        ZStack {
+            CircleTimerView(percent: 0.0)
+
+            VStack {
+                textView
+                Text("\(formatMilliseconds(viewModel.time))")
+                    .font(.system(.largeTitle))
+            }
+        }
     }
 
     func formatMilliseconds(_ counter: Double) -> String {
