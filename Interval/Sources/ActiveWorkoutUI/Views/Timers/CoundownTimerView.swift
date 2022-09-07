@@ -16,11 +16,12 @@ struct CountdownTimerView<TextView: View>: View {
 
     var body: some View {
         ZStack {
-            CircleTimerView(percent: viewModel.time / viewModel.fullTime)
+            CircleTimerView(percent: viewModel.percent)
+                .animation(Animation.linear, value: viewModel.percent)
 
             VStack {
                 textView
-                Text("\(formatMilliseconds(viewModel.time))")
+                Text("\(formatMilliseconds(viewModel.timeLeft))")
                     .font(.system(.largeTitle))
             }
         }
@@ -44,17 +45,21 @@ class CountdownTimerViewModel: ObservableObject {
 
     init(fullTime: TimeInterval, viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>) {
         self.viewStore = viewStore
+        self.timeLeft = fullTime
         self.fullTime = fullTime
         viewStore.publisher
             .sink(receiveValue: { [weak self] state in
                 self?.currentState = state.status
+                self?.accumulatedTime = state.currentIntervalStep.time
             })
             .store(in: &cancellableSet)
     }
 
-    @Published var timeLeft: TimeInterval = 0.0
-    @Published var time: TimeInterval = 0.0
+    @Published var percent = 1.0
+    @Published var timeLeft: TimeInterval
+
     let fullTime: TimeInterval
+    private var time: TimeInterval = 0.0
     private var accumulatedTime: TimeInterval = 0.0
 
     let viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>
@@ -81,7 +86,7 @@ class CountdownTimerViewModel: ObservableObject {
         self.time = viewStore.currentIntervalStep.time
 
         timer = Timer
-            .publish(every: 0.1, tolerance: 0.1, on: .main, in: .common)
+            .publish(every: 0.1, tolerance: 0.01, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
                 self?.handleTimerEvent()
@@ -92,15 +97,14 @@ class CountdownTimerViewModel: ObservableObject {
         let diff = Date().timeIntervalSince1970 - self.lastTimeStarted.timeIntervalSince1970
         time = accumulatedTime + diff
         timeLeft = fullTime - time
-        if timeLeft <= 0.0 {
+        percent = max(0.0, 1 - time / fullTime)
+        if percent == 0.0 {
+            timer?.cancel()
             viewStore.send(.stepFinished)
         }
     }
 
     func pauseTimer() {
-        time = viewStore.currentIntervalStep.time
-        timeLeft = fullTime - time
-
         timer?.cancel()
     }
 }

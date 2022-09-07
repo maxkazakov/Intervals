@@ -22,54 +22,55 @@ public struct ActiveWorkoutView: View {
     let store: Store<ActiveWorkout, ActiveWorkoutAction>
 
     public var body: some View {
-        EmptyView()
-//        WithViewStore(store) { viewStore in
-//            ZStack {
-//                VStack {
-//                    switch viewStore.state.currentIntervalStep.finishType {
-//                    case .byDistance:
-//                        EmptyView()
-//                    case let .byDuration(seconds):
-//                        CountdownTimerView(
-//                            viewModel: CountdownTimerViewModel(
-//                                fullTime: TimeInterval(seconds),
-//                                viewStore: viewStore
-//                            ),
-//                            textView: Text(viewStore.currentIntervalStep.name).font(.title2)
-//                        )
-//                    case .byTappingButton:
-//                        TimerView(
-//                            viewModel: TimerViewModel(viewStore: viewStore),
-//                            textView: Text(viewStore.currentIntervalStep.name).font(.title2)
-//                        )
-//                    }
-//                }
-//
-//                VStack {
-//                    if viewStore.state.status != .initial {
-//                        HStack {
-//                            StopButton(onStop: { viewStore.send(.stop) })
-//                            Spacer()
-//                            if let pauseButtonState = mapStatusToButton(viewStore.state.status) {
-//                                PauseResumeButton(state: pauseButtonState,
-//                                                  onStart: { viewStore.send(.start) },
-//                                                  onPause: { viewStore.send(.pause) })
-//                            }
-//                        }
-//                        Spacer()
-//                    } else {
-//                        Spacer()
-//                        HStack {
-//                            Spacer()
-//                            StartButton(onStart: { viewStore.send(.start) })
-//                            Spacer()
-//                        }
-//                    }
-//                }
-//                .padding(.horizontal, 12)
-//            }
-//            .background(Color.yellow.ignoresSafeArea())
-//        }
+        WithViewStore(store) { viewStore in
+            ZStack {
+                VStack {
+                    switch viewStore.state.currentIntervalStep.workoutIntervalStep.finishType {
+                    case .byDistance:
+                        EmptyView()
+                    case let .byDuration(seconds):
+                        CountdownTimerView(
+                            viewModel: CountdownTimerViewModel(
+                                fullTime: TimeInterval(seconds),
+                                viewStore: viewStore
+                            ),
+                            textView: Text(viewStore.currentIntervalStep.workoutIntervalStep.name).font(.title2)
+                        )
+                        .id(viewStore.state.currentIntervalStep.workoutIntervalStep.id)
+                        EmptyView()
+                    case .byTappingButton:
+                        TimerView(
+                            viewModel: TimerViewModel(viewStore: viewStore),
+                            textView: Text(viewStore.currentIntervalStep.workoutIntervalStep.name).font(.title2)
+                        )
+                    }
+                }
+
+                VStack {
+                    if viewStore.state.status != .initial {
+                        HStack {
+                            StopButton(onStop: { viewStore.send(.stop) })
+                            Spacer()
+                            if let pauseButtonState = mapStatusToButton(viewStore.state.status) {
+                                PauseResumeButton(state: pauseButtonState,
+                                                  onStart: { viewStore.send(.start) },
+                                                  onPause: { viewStore.send(.pause) })
+                            }
+                        }
+                        Spacer()
+                    } else {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            StartButton(onStart: { viewStore.send(.start) })
+                            Spacer()
+                        }
+                    }
+                }
+                .padding(.horizontal, 12)
+            }
+            .background(Color.yellow.ignoresSafeArea())
+        }
     }
 
     func mapStatusToButton(_ status: ActiveWorkoutStatus) -> PauseResumeButtonState? {
