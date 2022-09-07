@@ -83,6 +83,7 @@ public struct WorkoutPlanView: View {
                             .background(Color.blue)
                             .clipShape(Capsule(style: .continuous))
                     })
+                    .disabled(viewStore.state.intervals.count == 0)
                 }
                 .padding()
             }

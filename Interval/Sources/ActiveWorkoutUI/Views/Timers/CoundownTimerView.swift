@@ -1,8 +1,8 @@
 //
-//  TimerView.swift
+//  SwiftUIView.swift
 //  
 //
-//  Created by Максим Казаков on 04.09.2022.
+//  Created by Максим Казаков on 07.09.2022.
 //
 
 import SwiftUI
@@ -10,13 +10,13 @@ import Combine
 import ComposableArchitecture
 import ActiveWorkoutCore
 
-struct TimerView<TextView: View>: View {
-    @StateObject var viewModel: TimerViewModel
+struct CountdownTimerView<TextView: View>: View {
+    @StateObject var viewModel: CountdownTimerViewModel
     let textView: TextView
 
     var body: some View {
         ZStack {
-            CircleTimerView(percent: 0.0)
+            CircleTimerView(percent: viewModel.time / viewModel.fullTime)
 
             VStack {
                 textView
@@ -40,8 +40,21 @@ struct TimerView<TextView: View>: View {
 }
 
 // Needed for displaying timer on UI. It may be expensive to handle milliseconds throught store
-class TimerViewModel: ObservableObject {
+class CountdownTimerViewModel: ObservableObject {
+
+    init(fullTime: TimeInterval, viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>) {
+        self.viewStore = viewStore
+        self.fullTime = fullTime
+        viewStore.publisher
+            .sink(receiveValue: { [weak self] state in
+                self?.currentState = state.status
+            })
+            .store(in: &cancellableSet)
+    }
+
+    @Published var timeLeft: TimeInterval = 0.0
     @Published var time: TimeInterval = 0.0
+    let fullTime: TimeInterval
     private var accumulatedTime: TimeInterval = 0.0
 
     let viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>
@@ -63,15 +76,6 @@ class TimerViewModel: ObservableObject {
         }
     }
 
-    init(viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>) {
-        self.viewStore = viewStore
-        viewStore.publisher
-            .sink(receiveValue: { [weak self] state in
-                self?.currentState = state.status
-            })
-            .store(in: &cancellableSet)
-    }
-
     func startTimer() {
         self.lastTimeStarted = viewStore.currentIntervalStep.lastStartTime
         self.time = viewStore.currentIntervalStep.time
@@ -80,14 +84,23 @@ class TimerViewModel: ObservableObject {
             .publish(every: 0.1, tolerance: 0.1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
-                guard let self = self else { return }
-                let diff = Date().timeIntervalSince1970 - self.lastTimeStarted.timeIntervalSince1970
-                self.time = self.accumulatedTime + diff
+                self?.handleTimerEvent()
             }
     }
 
+    func handleTimerEvent() {
+        let diff = Date().timeIntervalSince1970 - self.lastTimeStarted.timeIntervalSince1970
+        time = accumulatedTime + diff
+        timeLeft = fullTime - time
+        if timeLeft <= 0.0 {
+            viewStore.send(.stepFinished)
+        }
+    }
+
     func pauseTimer() {
-        self.time = viewStore.currentIntervalStep.time
+        time = viewStore.currentIntervalStep.time
+        timeLeft = fullTime - time
+
         timer?.cancel()
     }
 }

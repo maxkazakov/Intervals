@@ -23,36 +23,45 @@ public struct WorkoutIntervalStep: Equatable {
         self.finishType = finishType
         self.intervalId = intervalId
     }
-
     let id: UUID
     public var name: String
     public let finishType: FinishType
     public let intervalId: Interval.Id
 }
 
+public struct CurrentWorkoutIntervalStep: Equatable {
+    public init(workoutIntervalStep: WorkoutIntervalStep) {
+        self.workoutIntervalStep = workoutIntervalStep
+    }
+    public var lastStartTime: Date = Date()
+    public var time: TimeInterval = 0
+    public let workoutIntervalStep: WorkoutIntervalStep
+}
+
 public struct ActiveWorkout: Identifiable, Equatable {
-    public init(id: UUID,
-                workoutPlan: WorkoutPlan,
-                time: TimeInterval = 0.0,
-                status: ActiveWorkoutStatus = .initial,
-                intervalSteps: [WorkoutIntervalStep],
-                currentIntervalStep: WorkoutIntervalStep?
+    public init(
+        id: UUID,
+        workoutPlan: WorkoutPlan,
+        time: TimeInterval = 0.0,
+        status: ActiveWorkoutStatus = .initial,
+        intervalSteps: [WorkoutIntervalStep],
+        currentIntervalStep: WorkoutIntervalStep
     ) {
         self.id = id
         self.workoutPlan = workoutPlan
         self.time = time
         self.status = status
         self.intervalSteps = intervalSteps
-        self.currentIntervalStep = currentIntervalStep
+        self.currentIntervalStep = CurrentWorkoutIntervalStep(workoutIntervalStep: currentIntervalStep)
     }
 
     public var id: UUID
     public let workoutPlan: WorkoutPlan
     public var time: TimeInterval = 0.0
-    public var lastTimeStarted = Date()
+    public var lastStartTime = Date()
     public var status: ActiveWorkoutStatus
     public var intervalSteps: [WorkoutIntervalStep]
-    public var currentIntervalStep: WorkoutIntervalStep?
+    public var currentIntervalStep: CurrentWorkoutIntervalStep
 }
 
 public struct ActiveWorkoutEnvironment {
@@ -67,21 +76,42 @@ public enum ActiveWorkoutAction: Equatable {
     case start
     case pause
     case stop
+    case stepFinished
 }
 
 public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, ActiveWorkoutEnvironment> { state, action, env in
     switch action {
     case .start:
-        state.lastTimeStarted = Date()
+        let now = Date()
+        state.lastStartTime = now
+        state.currentIntervalStep.lastStartTime = now
         state.status = .inProgress
         return .none
     case .pause:
-        state.time += Date().timeIntervalSince1970 - state.lastTimeStarted.timeIntervalSince1970
+        let timePassed = Date().timeIntervalSince1970 - state.lastStartTime.timeIntervalSince1970
+        state.time += timePassed
+        state.currentIntervalStep.time += timePassed
         state.status = .paused
         return .none
     case .stop:
-        state.time += Date().timeIntervalSince1970 - state.lastTimeStarted.timeIntervalSince1970
+        let timePassed = Date().timeIntervalSince1970 - state.lastStartTime.timeIntervalSince1970
+        state.time += timePassed
+        state.currentIntervalStep.time += timePassed
         state.status = .paused
+        return .none
+
+    case .stepFinished:
+        let timePassed = Date().timeIntervalSince1970 - state.lastStartTime.timeIntervalSince1970
+        state.time += timePassed
+        state.currentIntervalStep.time += timePassed
+
+        let idx = state.intervalSteps.firstIndex(of: state.currentIntervalStep.workoutIntervalStep)!
+        if idx == state.intervalSteps.count {
+            return Effect(value: .stop)
+        }
+
+        let nextStep = state.intervalSteps[idx + 1]
+        state.currentIntervalStep = CurrentWorkoutIntervalStep(workoutIntervalStep: nextStep)
         return .none
     }
 }

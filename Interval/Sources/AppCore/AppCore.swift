@@ -53,6 +53,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 let startWorkoutReducer = Reducer<AppState, AppAction, AppEnvironment>({ state, action, env in
     switch action {
     case let .workoutPlanList(.workoutPlan(_, action: .startWorkout(workoutPlan))):
+        assert(workoutPlan.intervals.count > 0)
         let intervalSteps: [WorkoutIntervalStep] = workoutPlan.intervals.flatMap { interval -> [WorkoutIntervalStep] in
             var steps = [WorkoutIntervalStep]()
             let mainStep = WorkoutIntervalStep(id: env.uuid(),
@@ -83,10 +84,12 @@ let startWorkoutReducer = Reducer<AppState, AppAction, AppEnvironment>({ state, 
             }
             return steps
         }
-        state.activeWorkout = ActiveWorkout(id: env.uuid(),
-                                            workoutPlan: workoutPlan,
-                                            intervalSteps: intervalSteps,
-                                            currentIntervalStep: intervalSteps.first)
+        state.activeWorkout = ActiveWorkout(
+            id: env.uuid(),
+            workoutPlan: workoutPlan,
+            intervalSteps: intervalSteps,
+            currentIntervalStep: intervalSteps.first!
+        )
 
         return .none
     case .activeWorkoutAction(.stop):
