@@ -49,8 +49,7 @@ class CountdownTimerViewModel: ObservableObject {
         self.fullTime = fullTime
         viewStore.publisher
             .sink(receiveValue: { [weak self] state in
-                self?.currentState = state.status
-                self?.accumulatedTime = state.currentIntervalStep.time
+                self?.onStateChanged(state)
             })
             .store(in: &cancellableSet)
     }
@@ -67,17 +66,22 @@ class CountdownTimerViewModel: ObservableObject {
     private var cancellableSet: Set<AnyCancellable> = []
     private var timer: AnyCancellable?
     private var lastTimeStarted = Date()
-    private var currentState = ActiveWorkoutStatus.initial {
-        didSet {
-            guard oldValue != currentState else { return }
-            switch currentState {
-            case .paused:
-                pauseTimer()
-            case .inProgress:
-                startTimer()
-            case .initial:
-                break
-            }
+    private var currentState = ActiveWorkoutStatus.initial
+
+    func onStateChanged(_ state: ActiveWorkout) {
+        guard currentState != state.status else { return }
+        accumulatedTime = state.currentIntervalStep.time
+        time = state.currentIntervalStep.time
+        lastTimeStarted = state.currentIntervalStep.lastStartTime
+
+        currentState = state.status
+        switch currentState {
+        case .paused:
+            pauseTimer()
+        case .inProgress:
+            startTimer()
+        case .initial:
+            break
         }
     }
 
@@ -100,7 +104,10 @@ class CountdownTimerViewModel: ObservableObject {
         percent = max(0.0, 1 - time / fullTime)
         if percent == 0.0 {
             timer?.cancel()
-            viewStore.send(.stepFinished)
+            // hack to wait for animation finished
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.viewStore.send(.stepFinished)
+//            }
         }
     }
 

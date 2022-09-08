@@ -28,6 +28,7 @@ public struct ActiveWorkoutView: View {
                     switch viewStore.state.currentIntervalStep.workoutIntervalStep.finishType {
                     case .byDistance:
                         EmptyView()
+
                     case let .byDuration(seconds):
                         CountdownTimerView(
                             viewModel: CountdownTimerViewModel(
@@ -37,12 +38,13 @@ public struct ActiveWorkoutView: View {
                             textView: Text(viewStore.currentIntervalStep.workoutIntervalStep.name).font(.title2)
                         )
                         .id(viewStore.state.currentIntervalStep.workoutIntervalStep.id)
-                        EmptyView()
+
                     case .byTappingButton:
                         TimerView(
                             viewModel: TimerViewModel(viewStore: viewStore),
                             textView: Text(viewStore.currentIntervalStep.workoutIntervalStep.name).font(.title2)
                         )
+                        .id(viewStore.state.currentIntervalStep.workoutIntervalStep.id)
                     }
                 }
 
@@ -58,6 +60,13 @@ public struct ActiveWorkoutView: View {
                             }
                         }
                         Spacer()
+                        if viewStore.state.currentIntervalStep.workoutIntervalStep.finishType == .byTappingButton {
+                            HStack {
+                                Spacer()
+                                NextStepButton(title: "next", action: { viewStore.send(.stepFinished) })
+                                Spacer()
+                            }
+                        }
                     } else {
                         Spacer()
                         HStack {

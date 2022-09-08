@@ -49,33 +49,35 @@ class TimerViewModel: ObservableObject {
     private var cancellableSet: Set<AnyCancellable> = []
     private var timer: AnyCancellable?
     private var lastTimeStarted = Date()
-    private var currentState = ActiveWorkoutStatus.initial {
-        didSet {
-            guard oldValue != currentState else { return }
-            switch currentState {
-            case .paused:
-                pauseTimer()
-            case .inProgress:
-                startTimer()
-            case .initial:
-                break
-            }
-        }
-    }
+    private var currentState = ActiveWorkoutStatus.initial
 
     init(viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>) {
         self.viewStore = viewStore
         viewStore.publisher
             .sink(receiveValue: { [weak self] state in
-                self?.currentState = state.status
+                self?.onStateChanged(state)
             })
             .store(in: &cancellableSet)
     }
 
-    func startTimer() {
-        self.lastTimeStarted = viewStore.currentIntervalStep.lastStartTime
-        self.time = viewStore.currentIntervalStep.time
+    func onStateChanged(_ state: ActiveWorkout) {
+        guard currentState != state.status else { return }
+        accumulatedTime = state.currentIntervalStep.time
+        time = state.currentIntervalStep.time
+        lastTimeStarted = state.currentIntervalStep.lastStartTime
 
+        currentState = state.status
+        switch currentState {
+        case .paused:
+            pauseTimer()
+        case .inProgress:
+            startTimer()
+        case .initial:
+            break
+        }
+    }
+
+    func startTimer() {
         timer = Timer
             .publish(every: 0.1, tolerance: 0.1, on: .main, in: .common)
             .autoconnect()
@@ -86,8 +88,12 @@ class TimerViewModel: ObservableObject {
             }
     }
 
+    func handleTimerEvent() {
+        let diff = Date().timeIntervalSince1970 - self.lastTimeStarted.timeIntervalSince1970
+        time = accumulatedTime + diff
+    }
+
     func pauseTimer() {
-        self.time = viewStore.currentIntervalStep.time
         timer?.cancel()
     }
 }
