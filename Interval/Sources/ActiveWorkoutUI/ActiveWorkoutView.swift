@@ -25,7 +25,7 @@ public struct ActiveWorkoutView: View {
         WithViewStore(store) { viewStore in
             ZStack {
                 VStack {
-                    switch viewStore.state.currentIntervalStep.workoutIntervalStep.finishType {
+                    switch viewStore.state.currentIntervalStep.finishType {
                     case .byDistance:
                         EmptyView()
 
@@ -35,16 +35,16 @@ public struct ActiveWorkoutView: View {
                                 fullTime: TimeInterval(seconds),
                                 viewStore: viewStore
                             ),
-                            textView: Text(viewStore.currentIntervalStep.workoutIntervalStep.name).font(.title2)
+                            textView: Text(viewStore.currentIntervalStep.name).font(.title2)
                         )
-                        .id(viewStore.state.currentIntervalStep.workoutIntervalStep.id)
+                        .id(viewStore.state.currentIntervalStep.id)
 
                     case .byTappingButton:
                         TimerView(
                             viewModel: TimerViewModel(viewStore: viewStore),
-                            textView: Text(viewStore.currentIntervalStep.workoutIntervalStep.name).font(.title2)
+                            textView: Text(viewStore.currentIntervalStep.name).font(.title2)
                         )
-                        .id(viewStore.state.currentIntervalStep.workoutIntervalStep.id)
+                        .id(viewStore.state.currentIntervalStep.id)
                     }
                 }
 
@@ -60,7 +60,7 @@ public struct ActiveWorkoutView: View {
                             }
                         }
                         Spacer()
-                        if viewStore.state.currentIntervalStep.workoutIntervalStep.finishType == .byTappingButton {
+                        if viewStore.state.currentIntervalStep.finishType == .byTappingButton {
                             HStack {
                                 Spacer()
                                 NextStepButton(title: "next", action: { viewStore.send(.stepFinished) })
@@ -113,13 +113,7 @@ struct ActiveWorkoutView_Previews: PreviewProvider {
             initialState: ActiveWorkout(
                 id: UUID(),
                 workoutPlan: workoutPlan,
-                time: 0.0011,
-                status: .inProgress,
-                intervalSteps: [],
-                currentIntervalStep: WorkoutIntervalStep(id: UUID(),
-                                                         name: "Running",
-                                                         finishType: .byDuration(seconds: 60),
-                                                         intervalId: Interval.Id())
+                intervalSteps: []
             ),
             reducer: activeWorkoutReducer,
             environment: ActiveWorkoutEnvironment(uuid: UUID.init)

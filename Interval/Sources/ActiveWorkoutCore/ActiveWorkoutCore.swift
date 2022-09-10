@@ -27,41 +27,39 @@ public struct WorkoutIntervalStep: Equatable {
     public var name: String
     public let finishType: FinishType
     public let intervalId: Interval.Id
-}
 
-public struct CurrentWorkoutIntervalStep: Equatable {
-    public init(workoutIntervalStep: WorkoutIntervalStep) {
-        self.workoutIntervalStep = workoutIntervalStep
-    }
     public var lastStartTime: Date = Date()
     public var time: TimeInterval = 0
-    public let workoutIntervalStep: WorkoutIntervalStep
+    public var isFinished = false
 }
 
 public struct ActiveWorkout: Identifiable, Equatable {
     public init(
         id: UUID,
         workoutPlan: WorkoutPlan,
-        time: TimeInterval = 0.0,
-        status: ActiveWorkoutStatus = .initial,
-        intervalSteps: [WorkoutIntervalStep],
-        currentIntervalStep: WorkoutIntervalStep
+        intervalSteps: [WorkoutIntervalStep]
     ) {
         self.id = id
         self.workoutPlan = workoutPlan
-        self.time = time
-        self.status = status
         self.intervalSteps = intervalSteps
-        self.currentIntervalStep = CurrentWorkoutIntervalStep(workoutIntervalStep: currentIntervalStep)
     }
 
     public var id: UUID
     public let workoutPlan: WorkoutPlan
     public var time: TimeInterval = 0.0
     public var lastStartTime = Date()
-    public var status: ActiveWorkoutStatus
+    public var status: ActiveWorkoutStatus = .initial
     public var intervalSteps: [WorkoutIntervalStep]
-    public var currentIntervalStep: CurrentWorkoutIntervalStep
+    public var currentIntervalIdx: Int = 0
+
+    public var currentIntervalStep: WorkoutIntervalStep {
+        get {
+            intervalSteps[currentIntervalIdx]
+        }
+        set {
+            intervalSteps[currentIntervalIdx] = newValue
+        }
+    }
 }
 
 public struct ActiveWorkoutEnvironment {
@@ -81,6 +79,7 @@ public enum ActiveWorkoutAction: Equatable {
 
 public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, ActiveWorkoutEnvironment> { state, action, env in
     switch action {
+
     case .start:
         let now = Date()
         state.lastStartTime = now
@@ -91,32 +90,41 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
     case .pause:
         let timePassed = Date().timeIntervalSince1970 - state.lastStartTime.timeIntervalSince1970
         state.time += timePassed
-        state.currentIntervalStep.time += timePassed
+
+        let timePassedForStep = Date().timeIntervalSince1970 - state.currentIntervalStep.lastStartTime.timeIntervalSince1970
+        state.currentIntervalStep.time += timePassedForStep
+
         state.status = .paused
         return .none
 
     case .stop:
-        let timePassed = Date().timeIntervalSince1970 - state.lastStartTime.timeIntervalSince1970
-        state.time += timePassed
-        state.currentIntervalStep.time += timePassed
-        state.status = .paused
+        if state.status == .inProgress {
+            let timePassed = Date().timeIntervalSince1970 - state.lastStartTime.timeIntervalSince1970
+            state.time += timePassed
+
+            let timePassedForStep = Date().timeIntervalSince1970 - state.currentIntervalStep.lastStartTime.timeIntervalSince1970
+            state.currentIntervalStep.time += timePassedForStep
+            state.status = .paused
+        }
+
         return .none
 
     case .stepFinished:
         let now = Date()
         let timePassed = now.timeIntervalSince1970 - state.lastStartTime.timeIntervalSince1970
         state.time += timePassed
-        state.currentIntervalStep.time += timePassed
 
-        let idx = state.intervalSteps.firstIndex(of: state.currentIntervalStep.workoutIntervalStep)!
-        let nextIdx = idx + 1
+        let timePassedForStep = Date().timeIntervalSince1970 - state.currentIntervalStep.lastStartTime.timeIntervalSince1970
+        state.currentIntervalStep.time += timePassedForStep
+        state.currentIntervalStep.isFinished = true
+
+        let nextIdx = state.currentIntervalIdx + 1
         if nextIdx == state.intervalSteps.count {
             return Effect(value: .stop)
         }
+        state.currentIntervalIdx = nextIdx
+        state.currentIntervalStep.lastStartTime = now
 
-        let nextStep = state.intervalSteps[nextIdx]
-        state.currentIntervalStep = CurrentWorkoutIntervalStep(workoutIntervalStep: nextStep)
-        state.lastStartTime = now
         return .none
     }
 }

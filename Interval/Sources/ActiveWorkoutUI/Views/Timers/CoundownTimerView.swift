@@ -104,10 +104,7 @@ class CountdownTimerViewModel: ObservableObject {
         percent = max(0.0, 1 - time / fullTime)
         if percent == 0.0 {
             timer?.cancel()
-            // hack to wait for animation finished
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.viewStore.send(.stepFinished)
-//            }
+            viewStore.send(.stepFinished)
         }
     }
 

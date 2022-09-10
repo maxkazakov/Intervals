@@ -87,8 +87,7 @@ let startWorkoutReducer = Reducer<AppState, AppAction, AppEnvironment>({ state, 
         state.activeWorkout = ActiveWorkout(
             id: env.uuid(),
             workoutPlan: workoutPlan,
-            intervalSteps: intervalSteps,
-            currentIntervalStep: intervalSteps.first!
+            intervalSteps: intervalSteps
         )
 
         return .none
