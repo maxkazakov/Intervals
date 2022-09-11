@@ -27,8 +27,6 @@ public struct WorkoutIntervalStep: Equatable {
     public var name: String
     public let finishType: FinishType
     public let intervalId: Interval.Id
-
-    public var lastStartTime: Date = Date()
     public var time: TimeInterval = 0
     public var isFinished = false
 }
@@ -47,7 +45,7 @@ public struct ActiveWorkout: Identifiable, Equatable {
     public var id: UUID
     public let workoutPlan: WorkoutPlan
     public var time: TimeInterval = 0.0
-    public var lastStartTime = Date()
+    public var previousTickTime = Date()
     public var status: ActiveWorkoutStatus = .initial
     public var intervalSteps: [WorkoutIntervalStep]
     public var currentIntervalIdx: Int = 0
@@ -64,9 +62,17 @@ public struct ActiveWorkout: Identifiable, Equatable {
 
 public struct ActiveWorkoutEnvironment {
     var uuid: () -> UUID
+    var mainQueue: AnySchedulerOf<DispatchQueue>
+    var now: () -> Date
 
-    public init(uuid: @escaping () -> UUID) {
+    public init(
+        uuid: @escaping () -> UUID,
+        mainQueue: AnySchedulerOf<DispatchQueue>,
+        now: @escaping () -> Date
+    ) {
         self.uuid = uuid
+        self.mainQueue = mainQueue
+        self.now = now
     }
 }
 
@@ -75,55 +81,56 @@ public enum ActiveWorkoutAction: Equatable {
     case pause
     case stop
     case stepFinished
+
+    case timerTicked
 }
 
 public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, ActiveWorkoutEnvironment> { state, action, env in
+    struct TimerID: Hashable {}
+
+    func moveTime(state: inout ActiveWorkout, env: ActiveWorkoutEnvironment) {
+        let now = env.now()
+
+        let timePassed = now.timeIntervalSince1970 - state.previousTickTime.timeIntervalSince1970
+        print("timePassed", timePassed)
+        state.time += timePassed
+        state.currentIntervalStep.time += timePassed
+        state.previousTickTime = now
+    }
+
     switch action {
+    case .timerTicked:
+        moveTime(state: &state, env: env)
+        return .none
 
     case .start:
-        let now = Date()
-        state.lastStartTime = now
-        state.currentIntervalStep.lastStartTime = now
+        let now = env.now()
+        state.previousTickTime = now
         state.status = .inProgress
-        return .none
+
+        return Effect.timer(
+            id: TimerID(),
+            every: 1.0,
+            tolerance: 0.02,
+            on: env.mainQueue
+        )
+        .map { _ in .timerTicked }
 
     case .pause:
-        let timePassed = Date().timeIntervalSince1970 - state.lastStartTime.timeIntervalSince1970
-        state.time += timePassed
-
-        let timePassedForStep = Date().timeIntervalSince1970 - state.currentIntervalStep.lastStartTime.timeIntervalSince1970
-        state.currentIntervalStep.time += timePassedForStep
-
         state.status = .paused
-        return .none
+        return .cancel(id: TimerID())
 
     case .stop:
-        if state.status == .inProgress {
-            let timePassed = Date().timeIntervalSince1970 - state.lastStartTime.timeIntervalSince1970
-            state.time += timePassed
-
-            let timePassedForStep = Date().timeIntervalSince1970 - state.currentIntervalStep.lastStartTime.timeIntervalSince1970
-            state.currentIntervalStep.time += timePassedForStep
-            state.status = .paused
-        }
-
-        return .none
+        state.status = .paused
+        return .cancel(id: TimerID())
 
     case .stepFinished:
-        let now = Date()
-        let timePassed = now.timeIntervalSince1970 - state.lastStartTime.timeIntervalSince1970
-        state.time += timePassed
-
-        let timePassedForStep = Date().timeIntervalSince1970 - state.currentIntervalStep.lastStartTime.timeIntervalSince1970
-        state.currentIntervalStep.time += timePassedForStep
         state.currentIntervalStep.isFinished = true
-
         let nextIdx = state.currentIntervalIdx + 1
         if nextIdx == state.intervalSteps.count {
             return Effect(value: .stop)
         }
         state.currentIntervalIdx = nextIdx
-        state.currentIntervalStep.lastStartTime = now
 
         return .none
     }

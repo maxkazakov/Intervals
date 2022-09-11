@@ -138,5 +138,10 @@ let package = Package(
             dependencies: ["WorkoutPlansListCore",
                            "TestHelpers"]
         ),
+        .testTarget(
+            name: "ActiveWorkoutCoreTests",
+            dependencies: ["ActiveWorkoutCore",
+                           "TestHelpers"]
+        ),
     ]
 )

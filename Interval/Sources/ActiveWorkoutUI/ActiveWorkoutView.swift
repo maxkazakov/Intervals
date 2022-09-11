@@ -31,17 +31,15 @@ public struct ActiveWorkoutView: View {
 
                     case let .byDuration(seconds):
                         CountdownTimerView(
-                            viewModel: CountdownTimerViewModel(
-                                fullTime: TimeInterval(seconds),
-                                viewStore: viewStore
-                            ),
+                            time: viewStore.state.currentIntervalStep.time,
+                            fullTime: TimeInterval(seconds),
                             textView: Text(viewStore.currentIntervalStep.name).font(.title2)
                         )
                         .id(viewStore.state.currentIntervalStep.id)
 
                     case .byTappingButton:
                         TimerView(
-                            viewModel: TimerViewModel(viewStore: viewStore),
+                            viewStore: viewStore,
                             textView: Text(viewStore.currentIntervalStep.name).font(.title2)
                         )
                         .id(viewStore.state.currentIntervalStep.id)
@@ -116,7 +114,7 @@ struct ActiveWorkoutView_Previews: PreviewProvider {
                 intervalSteps: []
             ),
             reducer: activeWorkoutReducer,
-            environment: ActiveWorkoutEnvironment(uuid: UUID.init)
+            environment: ActiveWorkoutEnvironment(uuid: UUID.init, mainQueue: .immediate.eraseToAnyScheduler(), now: Date.init)
         ))
     }
 }

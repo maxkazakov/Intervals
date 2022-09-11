@@ -45,7 +45,12 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             )
         }
     ),
-    activeWorkoutReducer.optional().pullback(state: \.activeWorkout, action: /AppAction.activeWorkoutAction, environment: { ActiveWorkoutEnvironment(uuid: $0.uuid) }),
+    activeWorkoutReducer
+        .optional()
+        .pullback(
+            state: \.activeWorkout,
+            action: /AppAction.activeWorkoutAction,
+            environment: { ActiveWorkoutEnvironment(uuid: $0.uuid, mainQueue: .main.eraseToAnyScheduler(), now: Date.init)}),
     startWorkoutReducer
 )
 .debug()
