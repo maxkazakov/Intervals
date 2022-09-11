@@ -88,19 +88,23 @@ public enum ActiveWorkoutAction: Equatable {
 public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, ActiveWorkoutEnvironment> { state, action, env in
     struct TimerID: Hashable {}
 
-    func moveTime(state: inout ActiveWorkout, env: ActiveWorkoutEnvironment) {
-        let now = env.now()
-
-        let timePassed = now.timeIntervalSince1970 - state.previousTickTime.timeIntervalSince1970
-        print("timePassed", timePassed)
-        state.time += timePassed
-        state.currentIntervalStep.time += timePassed
-        state.previousTickTime = now
-    }
 
     switch action {
     case .timerTicked:
-        moveTime(state: &state, env: env)
+        let now = env.now()
+        let timePassed = now.timeIntervalSince1970 - state.previousTickTime.timeIntervalSince1970
+        state.time += timePassed
+        state.currentIntervalStep.time += timePassed
+        state.previousTickTime = now
+
+        switch state.currentIntervalStep.finishType {
+        case let .byDuration(seconds):
+            if state.currentIntervalStep.time >= TimeInterval(seconds) {
+                return Effect(value: .stepFinished)
+            }
+        default:
+            break
+        }
         return .none
 
     case .start:
@@ -117,6 +121,7 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
         .map { _ in .timerTicked }
 
     case .pause:
+        // Todo: append time between last time and now
         state.status = .paused
         return .cancel(id: TimerID())
 

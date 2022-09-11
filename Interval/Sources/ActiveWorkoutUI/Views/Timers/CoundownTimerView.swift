@@ -33,7 +33,7 @@ struct CountdownTimerView<TextView: View>: View {
 
             VStack {
                 textView
-                Text("\(formatMilliseconds(timeLeft))")
+                Text("\(formatSeconds(timeLeft))")
                     .font(.system(.largeTitle))
             }
         }
@@ -50,6 +50,19 @@ struct CountdownTimerView<TextView: View>: View {
             return String(format: "%02d:%02d:%1d", minutes, seconds, milliseconds)
         }
     }
+
+    func formatSeconds(_ counter: Double) -> String {
+        let hours = Int(counter) / 60 / 60
+        let minutes = Int(counter) / 60 % 60
+        let seconds = Int(counter) % 60
+        if hours > 0 {
+            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            return String(format: "%02d:%02d", minutes, seconds)
+        }
+    }
+
+    
 }
 
 //class CountdownTimerViewModel: ObservableObject {
