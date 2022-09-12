@@ -48,6 +48,36 @@
                ReferencedContainer = "container:Intervals.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ActiveWorkoutCoreTests"
+               BuildableName = "ActiveWorkoutCoreTests"
+               BlueprintName = "ActiveWorkoutCoreTests"
+               ReferencedContainer = "container:Interval">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "WorkoutPlanCoreTests"
+               BuildableName = "WorkoutPlanCoreTests"
+               BlueprintName = "WorkoutPlanCoreTests"
+               ReferencedContainer = "container:Interval">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "WorkoutPlansListCoreTests"
+               BuildableName = "WorkoutPlansListCoreTests"
+               BlueprintName = "WorkoutPlansListCoreTests"
+               ReferencedContainer = "container:Interval">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

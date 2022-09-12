@@ -45,7 +45,6 @@ public struct ActiveWorkout: Identifiable, Equatable {
     public var id: UUID
     public let workoutPlan: WorkoutPlan
     public var time: TimeInterval = 0.0
-    public var previousTickTime = Date()
     public var status: ActiveWorkoutStatus = .initial
     public var intervalSteps: [WorkoutIntervalStep]
     public var currentIntervalIdx: Int = 0
@@ -91,11 +90,8 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
 
     switch action {
     case .timerTicked:
-        let now = env.now()
-        let timePassed = now.timeIntervalSince1970 - state.previousTickTime.timeIntervalSince1970
-        state.time += timePassed
-        state.currentIntervalStep.time += timePassed
-        state.previousTickTime = now
+        state.time += 1
+        state.currentIntervalStep.time += 1
 
         switch state.currentIntervalStep.finishType {
         case let .byDuration(seconds):
@@ -108,20 +104,15 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
         return .none
 
     case .start:
-        let now = env.now()
-        state.previousTickTime = now
         state.status = .inProgress
-
         return Effect.timer(
             id: TimerID(),
             every: 1.0,
-            tolerance: 0.02,
             on: env.mainQueue
         )
         .map { _ in .timerTicked }
 
     case .pause:
-        // Todo: append time between last time and now
         state.status = .paused
         return .cancel(id: TimerID())
 

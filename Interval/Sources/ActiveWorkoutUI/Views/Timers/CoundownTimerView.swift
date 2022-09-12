@@ -62,7 +62,17 @@ struct CountdownTimerView<TextView: View>: View {
         }
     }
 
-    
+    let formatter = DateComponentsFormatter()
+    func time(_ seconds: Int) -> String {
+        if seconds > 3600 {
+            formatter.allowedUnits = [.hour, .minute, .second]
+        } else {
+            formatter.allowedUnits = [.minute, .second]
+        }
+        formatter.unitsStyle = .positional
+        formatter.zeroFormattingBehavior = [.pad]
+        return formatter.string(from: TimeInterval(seconds))!
+    }
 }
 
 //class CountdownTimerViewModel: ObservableObject {
