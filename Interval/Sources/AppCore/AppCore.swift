@@ -53,7 +53,7 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             environment: { ActiveWorkoutEnvironment(uuid: $0.uuid, mainQueue: .main.eraseToAnyScheduler(), now: Date.init)}),
     startWorkoutReducer
 )
-.debug()
+//.debug()
 
 let startWorkoutReducer = Reducer<AppState, AppAction, AppEnvironment>({ state, action, env in
     switch action {

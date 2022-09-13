@@ -128,6 +128,15 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
         }
         state.currentIntervalIdx = nextIdx
 
-        return .none
+        // Restart timer, because next tick can be somewhere between swithing stages
+        return .merge([
+            .cancel(id: TimerID()),
+            Effect.timer(
+                id: TimerID(),
+                every: 1.0,
+                on: env.mainQueue
+            )
+            .map { _ in .timerTicked }
+        ])
     }
 }

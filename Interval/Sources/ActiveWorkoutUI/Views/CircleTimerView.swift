@@ -8,6 +8,12 @@
 import SwiftUI
 
 struct CircleTimerView: View {
+    internal init(percent: Double) {
+        self.percent = percent
+        print("CircleTimerView init", percent)
+    }
+
+
     let percent: Double
 
     var body: some View {

@@ -21,21 +21,20 @@ struct TimerView<TextView: View>: View {
 
             VStack {
                 textView
-                Text("\(formatMilliseconds(viewStore.state.currentIntervalStep.time))")
+                Text("\(formatSeconds(viewStore.state.currentIntervalStep.time))")
                     .font(.system(.largeTitle))
             }
         }
     }
 
-    func formatMilliseconds(_ counter: Double) -> String {
+    func formatSeconds(_ counter: Double) -> String {
         let hours = Int(counter) / 60 / 60
         let minutes = Int(counter) / 60 % 60
         let seconds = Int(counter) % 60
-        let milliseconds = Int(counter * 10) % 10
         if hours > 0 {
-            return String(format: "%02d:%02d:%02d:%1d", hours, minutes, seconds, milliseconds)
+            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
         } else {
-            return String(format: "%02d:%02d:%1d", minutes, seconds, milliseconds)
+            return String(format: "%02d:%02d", minutes, seconds)
         }
     }
 }

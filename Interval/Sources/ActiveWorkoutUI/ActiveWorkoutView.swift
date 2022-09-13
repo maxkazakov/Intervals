@@ -31,9 +31,10 @@ public struct ActiveWorkoutView: View {
 
                     case let .byDuration(seconds):
                         CountdownTimerView(
-                            time: viewStore.state.currentIntervalStep.time,
-                            fullTime: TimeInterval(seconds),
-                            textView: Text(viewStore.currentIntervalStep.name).font(.title2)
+                            viewModel: CountdownTimerViewModel(
+                                fullTime: TimeInterval(seconds),
+                                viewStore: viewStore
+                            )
                         )
                         .id(viewStore.state.currentIntervalStep.id)
 

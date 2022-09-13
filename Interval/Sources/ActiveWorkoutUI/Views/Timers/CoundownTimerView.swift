@@ -9,45 +9,34 @@ import SwiftUI
 import Combine
 import ComposableArchitecture
 import ActiveWorkoutCore
+import Foundation
 
-struct CountdownTimerView<TextView: View>: View {
-    internal init(time: TimeInterval, fullTime: TimeInterval, textView: TextView) {
-        self.time = time
-        self.fullTime = fullTime
-        self.textView = textView
+struct CountdownTimerView: View {
+    @StateObject var viewModel: CountdownTimerViewModel
 
-        self.timeLeft = fullTime - time
-        self.percent = max(0.0, 1 - time / fullTime)
+    private var remainingDuration: RemainingDurationProvider<Double> {
+        { currentPercent in
+            currentPercent * viewModel.fullTime
+        }
     }
-
-    let time: TimeInterval
-    let fullTime: TimeInterval
-    let textView: TextView
-    let percent: Double
-    let timeLeft: Double
+    private let animation: AnimationWithDurationProvider = { duration in
+            .linear(duration: duration)
+    }
 
     var body: some View {
         ZStack {
-            CircleTimerView(percent: percent)
-                .animation(Animation.linear, value: percent)
+            CircleTimerView(percent: viewModel.percent)
+                .pausableAnimation(binding: $viewModel.percent,
+                                   targetValue: 0.0,
+                                   remainingDuration: remainingDuration,
+                                   animation: animation,
+                                   paused: $viewModel.isPaused)
 
             VStack {
-                textView
-                Text("\(formatSeconds(timeLeft))")
+                Text(viewModel.name).font(.title2)
+                Text("\(formatSeconds(viewModel.timeLeft))")
                     .font(.system(.largeTitle))
             }
-        }
-    }
-
-    func formatMilliseconds(_ counter: Double) -> String {
-        let hours = Int(counter) / 60 / 60
-        let minutes = Int(counter) / 60 % 60
-        let seconds = Int(counter) % 60
-        let milliseconds = Int(counter * 10) % 10
-        if hours > 0 {
-            return String(format: "%02d:%02d:%02d:%1d", hours, minutes, seconds, milliseconds)
-        } else {
-            return String(format: "%02d:%02d:%1d", minutes, seconds, milliseconds)
         }
     }
 
@@ -61,103 +50,81 @@ struct CountdownTimerView<TextView: View>: View {
             return String(format: "%02d:%02d", minutes, seconds)
         }
     }
+}
 
-    let formatter = DateComponentsFormatter()
-    func time(_ seconds: Int) -> String {
-        if seconds > 3600 {
-            formatter.allowedUnits = [.hour, .minute, .second]
-        } else {
-            formatter.allowedUnits = [.minute, .second]
+class CountdownTimerViewModel: ObservableObject {
+
+    @Published var percent = 1.0
+    @Published var timeLeft: TimeInterval = 0.0
+    @Published var isPaused = false
+
+    let name: String
+    let fullTime: TimeInterval
+    let viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>
+
+    private var currentState = ActiveWorkoutStatus.initial
+    private var cancellableSet: Set<AnyCancellable> = []
+
+    init(fullTime: TimeInterval, viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>) {
+        self.viewStore = viewStore
+        self.fullTime = fullTime
+        self.name = viewStore.currentIntervalStep.name
+        self.percent = 1.0
+
+        viewStore.publisher
+            .sink(receiveValue: { [weak self] state in
+                self?.onStateChanged(state)
+            })
+            .store(in: &cancellableSet)
+    }
+
+    func onStateChanged(_ state: ActiveWorkout) {
+        self.timeLeft = fullTime - state.currentIntervalStep.time
+
+        guard currentState != state.status else { return }
+        defer { currentState = state.status }
+
+        isPaused = state.status == .paused
+
+        switch state.status {
+        case .inProgress:
+            DispatchQueue.main.async {
+                withAnimation(Animation.linear(duration: self.fullTime)) {
+                    self.percent = 0.0
+                }
+            }
+        default:
+            break
         }
-        formatter.unitsStyle = .positional
-        formatter.zeroFormattingBehavior = [.pad]
-        return formatter.string(from: TimeInterval(seconds))!
+
     }
 }
 
-//class CountdownTimerViewModel: ObservableObject {
-//
-//    init(time: TimeInterval, fullTime: TimeInterval) {
-////        self.viewStore = viewStore
-////        self.fullTime = fullTime
-////        self.time = time
-//
-//        self.percent = max(0.0, 1 - time / fullTime)
-//    }
-//
-//    @Published var percent = 1.0
-//    @Published var timeLeft = 0.0
-//}
+public struct StoppableAnimationModifier<Value: VectorArithmetic>: AnimatableModifier {
+    @Binding var binding: Value
+    @Binding var paused: Bool
 
-// Needed for displaying timer on UI. It may be expensive to handle milliseconds throught store
-//class CountdownTimerViewModel: ObservableObject {
-//
-//    init(fullTime: TimeInterval, viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>) {
-//        self.viewStore = viewStore
-//        self.timeLeft = fullTime
-//        self.fullTime = fullTime
-//        viewStore.publisher
-//            .sink(receiveValue: { [weak self] state in
-//                self?.onStateChanged(state)
-//            })
-//            .store(in: &cancellableSet)
-//    }
-//
-//    @Published var percent = 1.0
-//    @Published var timeLeft: TimeInterval
-//
-//    let fullTime: TimeInterval
-//    private var time: TimeInterval = 0.0
-//    private var accumulatedTime: TimeInterval = 0.0
-//
-//    let viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>
-//
-//    private var cancellableSet: Set<AnyCancellable> = []
-//    private var timer: AnyCancellable?
-//    private var lastTimeStarted = Date()
-//    private var currentState = ActiveWorkoutStatus.initial
-//
-//    func onStateChanged(_ state: ActiveWorkout) {
-//        guard currentState != state.status else { return }
-//        accumulatedTime = state.currentIntervalStep.time
-//        time = state.currentIntervalStep.time
-//        lastTimeStarted = state.currentIntervalStep.lastStartTime
-//
-//        currentState = state.status
-//        switch currentState {
-//        case .paused:
-//            pauseTimer()
-//        case .inProgress:
-//            startTimer()
-//        case .initial:
-//            break
-//        }
-//    }
-//
-//    func startTimer() {
-//        self.lastTimeStarted = viewStore.currentIntervalStep.lastStartTime
-//        self.time = viewStore.currentIntervalStep.time
-//
-//        timer = Timer
-//            .publish(every: 0.1, tolerance: 0.01, on: .main, in: .common)
-//            .autoconnect()
-//            .sink { [weak self] _ in
-//                self?.handleTimerEvent()
-//            }
-//    }
-//
-//    func handleTimerEvent() {
-//        let diff = Date().timeIntervalSince1970 - self.lastTimeStarted.timeIntervalSince1970
-//        time = accumulatedTime + diff
-//        timeLeft = fullTime - time
-//        percent = max(0.0, 1 - time / fullTime)
-//        if percent == 0.0 {
-//            timer?.cancel()
-//            viewStore.send(.stepFinished)
-//        }
-//    }
-//
-//    func pauseTimer() {
-//        timer?.cancel()
-//    }
-//}
+    public var animatableData: Value  {
+        didSet {
+            print("animatableData", animatableData)
+        }
+    }
+
+    public init(binding: Binding<Value>,
+                paused: Binding<Bool>) {
+        _binding = binding
+        _paused = paused
+        animatableData = binding.wrappedValue
+    }
+
+    public func body(content: Content) -> some View {
+        content
+            .onChange(of: paused) { isPaused in
+                if isPaused {
+                    withAnimation(.instant) {
+                        binding = animatableData // the magic happens here
+                    }
+                }
+            }
+    }
+}
