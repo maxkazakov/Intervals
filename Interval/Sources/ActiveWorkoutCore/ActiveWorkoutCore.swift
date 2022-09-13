@@ -89,6 +89,9 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
 
 
     switch action {
+    // Why I don't use state.time += now() - lastTick time date instead of stupid state.time += 1:
+    // because tolerance of miliseconds ruins displaying seconds. E.g. if passed time is 3.1 and remaining is 1.9, I will show on view "00:01" ms, but I want to show "00:02".
+    // That means I have to round to nearest seconds. It's looks silly
     case .timerTicked:
         state.time += 1
         state.currentIntervalStep.time += 1
@@ -113,6 +116,8 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
         .map { _ in .timerTicked }
 
     case .pause:
+        // I stop timer here, that means that if real time passed is 2.9 seconds, I tracked only 2 tick what is 2 seconds.
+        // It's not a big problem for logic. But coutdown timer animation will show exact 2.9 and when interval continues the countdown view will finish its animation earlier than interval itself
         state.status = .paused
         return .cancel(id: TimerID())
 

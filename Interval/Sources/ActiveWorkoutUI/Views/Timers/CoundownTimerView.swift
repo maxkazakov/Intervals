@@ -88,6 +88,7 @@ class CountdownTimerViewModel: ObservableObject {
 
         switch state.status {
         case .inProgress:
+            // Without .main.async percent is not animation, but equals to 0
             DispatchQueue.main.async {
                 withAnimation(Animation.linear(duration: self.fullTime)) {
                     self.percent = 0.0
@@ -97,34 +98,5 @@ class CountdownTimerViewModel: ObservableObject {
             break
         }
 
-    }
-}
-
-public struct StoppableAnimationModifier<Value: VectorArithmetic>: AnimatableModifier {
-    @Binding var binding: Value
-    @Binding var paused: Bool
-
-    public var animatableData: Value  {
-        didSet {
-            print("animatableData", animatableData)
-        }
-    }
-
-    public init(binding: Binding<Value>,
-                paused: Binding<Bool>) {
-        _binding = binding
-        _paused = paused
-        animatableData = binding.wrappedValue
-    }
-
-    public func body(content: Content) -> some View {
-        content
-            .onChange(of: paused) { isPaused in
-                if isPaused {
-                    withAnimation(.instant) {
-                        binding = animatableData // the magic happens here
-                    }
-                }
-            }
     }
 }
