@@ -16,11 +16,14 @@ struct CountdownTimerView: View {
 
     private var remainingDuration: RemainingDurationProvider<Double> {
         { currentPercent in
-            currentPercent * viewModel.fullTime
+            let remainDuration = currentPercent * viewModel.fullTime
+            print("remainDuration", remainDuration)
+            return remainDuration
         }
     }
     private let animation: AnimationWithDurationProvider = { duration in
-            .linear(duration: duration)
+            print("animation duration", duration)
+            return .linear(duration: duration)
     }
 
     var body: some View {
@@ -38,6 +41,7 @@ struct CountdownTimerView: View {
                     .font(.system(.largeTitle))
             }
         }
+        .onAppear(perform: viewModel.onAppear)
     }
 
     func formatSeconds(_ counter: Double) -> String {
@@ -70,6 +74,11 @@ class CountdownTimerViewModel: ObservableObject {
         self.fullTime = fullTime
         self.name = viewStore.currentIntervalStep.name
         self.percent = 1.0
+    }
+
+    var isAppeared = false
+    func onAppear() {
+        guard !isAppeared else { return }
 
         viewStore.publisher
             .sink(receiveValue: { [weak self] state in
@@ -78,6 +87,7 @@ class CountdownTimerViewModel: ObservableObject {
             .store(in: &cancellableSet)
     }
 
+    var animationStarted = false
     func onStateChanged(_ state: ActiveWorkout) {
         self.timeLeft = fullTime - state.currentIntervalStep.time
 
@@ -86,17 +96,11 @@ class CountdownTimerViewModel: ObservableObject {
 
         isPaused = state.status == .paused
 
-        switch state.status {
-        case .inProgress:
-            // Without .main.async percent is not animation, but equals to 0
-            DispatchQueue.main.async {
-                withAnimation(Animation.linear(duration: self.fullTime)) {
-                    self.percent = 0.0
-                }
+        if state.status == .inProgress, !animationStarted {
+            animationStarted = true
+            withAnimation(Animation.linear(duration: self.fullTime)) {
+                self.percent = 0.0
             }
-        default:
-            break
         }
-
     }
 }
