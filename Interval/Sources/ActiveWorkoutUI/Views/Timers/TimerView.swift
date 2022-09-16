@@ -21,79 +21,37 @@ struct TimerView<TextView: View>: View {
 
             VStack {
                 textView
-                Text("\(formatSeconds(viewStore.state.currentIntervalStep.time))")
-                    .font(.system(.largeTitle))
+                Text("\(viewStore.state.currentIntervalStep.time.formatMilliseconds())")
+                    .font(.system(.largeTitle, design: .monospaced))
             }
-        }
-    }
-
-    func formatSeconds(_ counter: Double) -> String {
-        let hours = Int(counter) / 60 / 60
-        let minutes = Int(counter) / 60 % 60
-        let seconds = Int(counter) % 60
-        if hours > 0 {
-            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%02d:%02d", minutes, seconds)
         }
     }
 }
 
-// Needed for displaying timer on UI. It may be expensive to handle milliseconds throught store
-//class TimerViewModel: ObservableObject {
-//    @Published var time: TimeInterval = 0.0
-//    private var accumulatedTime: TimeInterval = 0.0
-//
-//    let viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>
-//
-//    private var cancellableSet: Set<AnyCancellable> = []
-//    private var timer: AnyCancellable?
-//    private var lastTimeStarted = Date()
-//    private var currentState = ActiveWorkoutStatus.initial
-//
-//    init(viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>) {
-//        self.viewStore = viewStore
-//        viewStore.publisher
-//            .sink(receiveValue: { [weak self] state in
-//                self?.onStateChanged(state)
-//            })
-//            .store(in: &cancellableSet)
-//    }
-//
-//    func onStateChanged(_ state: ActiveWorkout) {
-//        guard currentState != state.status else { return }
-//        accumulatedTime = state.currentIntervalStep.time
-//        time = state.currentIntervalStep.time
-//        lastTimeStarted = state.currentIntervalStep.lastStartTime
-//
-//        currentState = state.status
-//        switch currentState {
-//        case .paused:
-//            pauseTimer()
-//        case .inProgress:
-//            startTimer()
-//        case .initial:
-//            break
-//        }
-//    }
-//
-//    func startTimer() {
-//        timer = Timer
-//            .publish(every: 0.1, tolerance: 0.1, on: .main, in: .common)
-//            .autoconnect()
-//            .sink { [weak self] _ in
-//                guard let self = self else { return }
-//                let diff = Date().timeIntervalSince1970 - self.lastTimeStarted.timeIntervalSince1970
-//                self.time = self.accumulatedTime + diff
-//            }
-//    }
-//
-//    func handleTimerEvent() {
-//        let diff = Date().timeIntervalSince1970 - self.lastTimeStarted.timeIntervalSince1970
-//        time = accumulatedTime + diff
-//    }
-//
-//    func pauseTimer() {
-//        timer?.cancel()
-//    }
-//}
+extension Double {
+    func formatSeconds() -> String {
+        let hours = Int(self) / 60 / 60
+        let minutes = Int(self) / 60 % 60
+        let seconds = Int(self) % 60
+        let miliseconds = Int(self * 10) % 10
+        if hours > 0 {
+            return String(format: "%02d:%02d:%02d:%1d", hours, minutes, seconds, miliseconds)
+        } else {
+            return String(format: "%02d:%02d:%1d", minutes, seconds, miliseconds)
+        }
+    }
+}
+
+extension Int {
+    func formatMilliseconds() -> String {
+        let seconds = self / 1000
+        let ms = self % 1000 / 100
+        let hours = seconds / 60 / 60
+        let minutes = seconds / 60 % 60
+        if hours > 0 {
+            return String(format: "%02d:%02d:%02d:%1d", hours, minutes, seconds, ms)
+        } else {
+            return String(format: "%02d:%02d:%1d", minutes, seconds, ms)
+        }
+    }
+}

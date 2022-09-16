@@ -49,39 +49,36 @@ final class ActiveWorkoutCoreTests: XCTestCase {
             $0.status = .inProgress
         }
 
-        scheduler.advance(by: .seconds(2.0))
+        scheduler.advance(by: .seconds(0.2))
 
         store.receive(.timerTicked) {
-            $0.time = 1.0
-            $0.currentIntervalStep.time = 1.0
+            $0.time = 100
+            $0.currentIntervalStep.time = 100
         }
         store.receive(.timerTicked) {
-            $0.time = 2.0
-            $0.currentIntervalStep.time = 2.0
+            $0.time = 200
+            $0.currentIntervalStep.time = 200
         }
 
         store.send(.pause) {
             $0.status = .paused
         }
 
-        (1...5).forEach { _ in
-            now.addTimeInterval(1.0)
-            scheduler.advance(by: .seconds(1.0))
-        }
+        scheduler.advance(by: .seconds(0.5))
 
         store.send(.start) {
             $0.status = .inProgress
         }
 
-        scheduler.advance(by: .seconds(2.0))
+        scheduler.advance(by: .seconds(0.2))
 
         store.receive(.timerTicked) {
-            $0.time = 3.0
-            $0.currentIntervalStep.time = 3.0
+            $0.time = 300
+            $0.currentIntervalStep.time = 300
         }
         store.receive(.timerTicked) {
-            $0.time = 4.0
-            $0.currentIntervalStep.time = 4.0
+            $0.time = 400
+            $0.currentIntervalStep.time = 400
         }
 
         store.send(.stop) {
@@ -103,7 +100,7 @@ final class ActiveWorkoutCoreTests: XCTestCase {
             WorkoutIntervalStep(
                 id: UUID(),
                 name: "Interval 1",
-                finishType: .byDuration(seconds: 2),
+                finishType: .byDuration(seconds: 1),
                 intervalId: Interval.Id()
             ),
             WorkoutIntervalStep(
@@ -128,26 +125,27 @@ final class ActiveWorkoutCoreTests: XCTestCase {
             $0.status = .inProgress
         }
 
-        scheduler.advance(by: .seconds(2.0))
+        scheduler.advance(by: .seconds(1))
 
-        store.receive(.timerTicked) {
-            $0.time = 1.0
-            $0.currentIntervalStep.time = 1.0
+        (1...10).forEach { tickIdx in
+            store.receive(.timerTicked) {
+                $0.time = 100 * tickIdx
+                $0.currentIntervalStep.time = 100 * tickIdx
+            }
         }
-        store.receive(.timerTicked) {
-            $0.time = 2.0
-            $0.currentIntervalStep.time = 2.0
-        }
+
         store.receive(.stepFinished) {
             $0.currentIntervalIdx = 1
             $0.intervalSteps[0].isFinished = true
         }
 
-        scheduler.advance(by: .seconds(1.0))
+        scheduler.advance(by: .seconds(1))
 
-        store.receive(.timerTicked) {
-            $0.time = 3.0
-            $0.currentIntervalStep.time = 1.0
+        (1...10).forEach { tickIdx in
+            store.receive(.timerTicked) {
+                $0.time = 100 * tickIdx + 1000
+                $0.currentIntervalStep.time = 100 * tickIdx
+            }
         }
 
         store.send(.stop) {

@@ -1,5 +1,5 @@
 //
-//  SwiftUIView.swift
+//  CountdownTimerView.swift
 //  
 //
 //  Created by Максим Казаков on 07.09.2022.
@@ -16,14 +16,12 @@ struct CountdownTimerView: View {
 
     private var remainingDuration: RemainingDurationProvider<Double> {
         { currentPercent in
-            let remainDuration = currentPercent * viewModel.fullTime
-            print("remainDuration", remainDuration)
+            let remainDuration = currentPercent * (Double(viewModel.fullTime) / 1000)
             return remainDuration
         }
     }
     private let animation: AnimationWithDurationProvider = { duration in
-            print("animation duration", duration)
-            return .linear(duration: duration)
+            .linear(duration: duration)
     }
 
     var body: some View {
@@ -37,39 +35,28 @@ struct CountdownTimerView: View {
 
             VStack {
                 Text(viewModel.name).font(.title2)
-                Text("\(formatSeconds(viewModel.timeLeft))")
-                    .font(.system(.largeTitle))
+                Text("\(viewModel.timeLeft.formatMilliseconds())")
+                    .font(.system(.largeTitle, design: .monospaced))
             }
         }
         .onAppear(perform: viewModel.onAppear)
-    }
-
-    func formatSeconds(_ counter: Double) -> String {
-        let hours = Int(counter) / 60 / 60
-        let minutes = Int(counter) / 60 % 60
-        let seconds = Int(counter) % 60
-        if hours > 0 {
-            return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            return String(format: "%02d:%02d", minutes, seconds)
-        }
     }
 }
 
 class CountdownTimerViewModel: ObservableObject {
 
     @Published var percent = 1.0
-    @Published var timeLeft: TimeInterval = 0.0
+    @Published var timeLeft: Int = 0
     @Published var isPaused = false
 
     let name: String
-    let fullTime: TimeInterval
+    let fullTime: Int
     let viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>
 
     private var currentState = ActiveWorkoutStatus.initial
     private var cancellableSet: Set<AnyCancellable> = []
 
-    init(fullTime: TimeInterval, viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>) {
+    init(fullTime: Int, viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>) {
         self.viewStore = viewStore
         self.fullTime = fullTime
         self.name = viewStore.currentIntervalStep.name
@@ -89,7 +76,7 @@ class CountdownTimerViewModel: ObservableObject {
 
     var animationStarted = false
     func onStateChanged(_ state: ActiveWorkout) {
-        self.timeLeft = fullTime - state.currentIntervalStep.time
+        self.timeLeft = fullTime - state.currentIntervalStep.time        
 
         guard currentState != state.status else { return }
         defer { currentState = state.status }
@@ -98,7 +85,7 @@ class CountdownTimerViewModel: ObservableObject {
 
         if state.status == .inProgress, !animationStarted {
             animationStarted = true
-            withAnimation(Animation.linear(duration: self.fullTime)) {
+            withAnimation(Animation.linear(duration: Double(self.fullTime) / 1000)) {
                 self.percent = 0.0
             }
         }

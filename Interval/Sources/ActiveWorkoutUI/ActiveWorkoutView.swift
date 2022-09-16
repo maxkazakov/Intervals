@@ -32,7 +32,7 @@ public struct ActiveWorkoutView: View {
                     case let .byDuration(seconds):
                         CountdownTimerView(
                             viewModel: CountdownTimerViewModel(
-                                fullTime: TimeInterval(seconds),
+                                fullTime: seconds * 1000,
                                 viewStore: viewStore
                             )
                         )
