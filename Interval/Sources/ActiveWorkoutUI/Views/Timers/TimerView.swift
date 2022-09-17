@@ -28,26 +28,15 @@ struct TimerView<TextView: View>: View {
     }
 }
 
-extension Double {
-    func formatSeconds() -> String {
-        let hours = Int(self) / 60 / 60
-        let minutes = Int(self) / 60 % 60
-        let seconds = Int(self) % 60
-        let miliseconds = Int(self * 10) % 10
-        if hours > 0 {
-            return String(format: "%02d:%02d:%02d:%1d", hours, minutes, seconds, miliseconds)
-        } else {
-            return String(format: "%02d:%02d:%1d", minutes, seconds, miliseconds)
-        }
-    }
-}
-
 extension Int {
     func formatMilliseconds() -> String {
-        let seconds = self / 1000
+        let totalSeconds = self / 1000
+
+        let hours = totalSeconds / 60 / 60
+        let minutes = totalSeconds / 60 % 60
+        let seconds = totalSeconds % 60
         let ms = self % 1000 / 100
-        let hours = seconds / 60 / 60
-        let minutes = seconds / 60 % 60
+
         if hours > 0 {
             return String(format: "%02d:%02d:%02d:%1d", hours, minutes, seconds, ms)
         } else {

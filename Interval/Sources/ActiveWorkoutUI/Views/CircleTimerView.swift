@@ -18,11 +18,12 @@ struct CircleTimerView: View {
                 .stroke(style: StrokeStyle(lineWidth: 20, lineCap: .round))
                 .fill(Color.black)
                 .rotationEffect(.degrees(-90))
+                .aspectRatio(contentMode: .fit)
 
             Circle()
                 .stroke(Color.black.opacity(0.1), lineWidth: 20)
                 .rotationEffect(.degrees(-90))
+                .aspectRatio(contentMode: .fit)
         }
-        .padding(.horizontal, 32)
     }
 }

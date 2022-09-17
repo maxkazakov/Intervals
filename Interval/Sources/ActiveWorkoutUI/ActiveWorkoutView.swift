@@ -45,6 +45,12 @@ public struct ActiveWorkoutView: View {
                         )
                         .id(viewStore.state.currentIntervalStep.id)
                     }
+
+                    HStack {
+                        Spacer()
+                        NextStepButton(title: "next", action: { viewStore.send(.stepFinished) })
+                    }
+                    .opacity(viewStore.state.status == .initial ? 0 : 1)
                 }
 
                 VStack {
@@ -59,13 +65,6 @@ public struct ActiveWorkoutView: View {
                             }
                         }
                         Spacer()
-                        if viewStore.state.currentIntervalStep.finishType == .byTappingButton {
-                            HStack {
-                                Spacer()
-                                NextStepButton(title: "next", action: { viewStore.send(.stepFinished) })
-                                Spacer()
-                            }
-                        }
                     } else {
                         Spacer()
                         HStack {
@@ -75,8 +74,8 @@ public struct ActiveWorkoutView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 12)
             }
+            .padding(.horizontal, 12)
             .background(Color.yellow.ignoresSafeArea())
         }
     }

@@ -10,17 +10,18 @@ import SwiftUI
 struct NextStepButton: View {
     let title: String
     let action: () -> Void
+    @GestureState var tap = false
 
     var body: some View {
         Button(
-            action: action,
+            action: { action() },
             label: {
-                Text(title)
-                    .font(.title2)
+                Image(systemName: "forward.fill")
+                //                    .imageScale(.large)
                     .foregroundColor(.white)
-                    .padding(30)
+                    .padding(8)
                     .background(Color.black)
-                    .clipShape(Circle())
+                    .clipShape(Capsule())
             }
         )
     }
