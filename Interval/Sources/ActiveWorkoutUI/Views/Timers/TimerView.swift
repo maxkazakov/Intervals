@@ -11,7 +11,6 @@ import ComposableArchitecture
 import ActiveWorkoutCore
 
 struct TimerView<TextView: View>: View {
-//    @StateObject var viewModel: TimerViewModel
     let viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>
     let textView: TextView
 
