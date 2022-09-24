@@ -2,6 +2,7 @@ import XCTest
 import ComposableArchitecture
 @testable import IntervalCore
 
+@MainActor
 final class IntervalCoreTests: XCTestCase {
 
     func testNameChanged() throws {
@@ -44,18 +45,21 @@ final class IntervalCoreTests: XCTestCase {
         }
     }
 
-    func testPaceChangedToChanged() throws {
+    func testPaceChangedToChanged() async throws {
         let store = TestStore(
             initialState: Interval(id: Interval.Id.init(UUID()), name: "Running", finishType: .byTappingButton, paceRange: 100...120),
             reducer: intervalReducer,
             environment: IntervalEnvironment()
         )
 
-        store.send(.paceRangeToChanged(90)) { state in
+        await store.send(.paceRangeToChanged(90)) { state in
             state.paceRange = 90...90
         }
+//        store.send(.paceRangeToChanged(90)) { state in
+//            state.paceRange = 90...90
+//        }
 
-        store.send(.paceRangeToChanged(120)) { state in
+        await store.send(.paceRangeToChanged(120)) { state in
             state.paceRange = 90...120
         }
     }

@@ -42,9 +42,16 @@ let package = Package(
         .library(
             name: "ActiveWorkoutUI",
             targets: ["ActiveWorkoutUI"]),
+        .library(
+            name: "LocationAccessCore",
+            targets: ["LocationAccessCore"]),
+        .library(
+            name: "LocationAccessUI",
+            targets: ["LocationAccessUI"]),
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.40.2"),
+        .package(url: "https://github.com/pointfreeco/composable-core-location", from: "0.2.0"),
     ],
     targets: [
         .target(
@@ -61,6 +68,16 @@ let package = Package(
                 "AppCore",
                 "WorkoutPlansListUI",
                 "ActiveWorkoutUI"
+            ]
+        ),
+        .target(
+            name: "LocationAccessCore",
+            dependencies: [.product(name: "ComposableCoreLocation", package: "composable-core-location")]
+        ),
+        .target(
+            name: "LocationAccessUI",
+            dependencies: [
+                "LocationAccessCore"
             ]
         ),
         .target(
@@ -141,6 +158,11 @@ let package = Package(
         .testTarget(
             name: "ActiveWorkoutCoreTests",
             dependencies: ["ActiveWorkoutCore",
+                           "TestHelpers"]
+        ),
+        .testTarget(
+            name: "LocationAccessCoreTests",
+            dependencies: ["LocationAccessCore",
                            "TestHelpers"]
         ),
     ]
