@@ -127,13 +127,16 @@ let package = Package(
         .target(
             name: "ActiveWorkoutCore",
             dependencies: [
-                "WorkoutPlanCore"
+                "WorkoutPlanCore",
+                "LocationAccessCore",
+                .product(name: "ComposableCoreLocation", package: "composable-core-location")
             ]
         ),
         .target(
             name: "ActiveWorkoutUI",
             dependencies: [
-                "ActiveWorkoutCore"
+                "ActiveWorkoutCore",
+                "LocationAccessUI"
             ]
         ),
 

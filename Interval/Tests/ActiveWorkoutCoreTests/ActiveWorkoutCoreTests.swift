@@ -22,7 +22,8 @@ final class ActiveWorkoutCoreTests: XCTestCase {
         let env = ActiveWorkoutEnvironment(
             uuid: UUID.incrementing,
             mainQueue: scheduler.eraseToAnyScheduler(),
-            now: { self.now }
+            now: { self.now },
+            locationManager: .failing
         )
 
         let workoutPlan = WorkoutPlan(id: UUID(), name: "Running", intervals: [])
@@ -92,7 +93,8 @@ final class ActiveWorkoutCoreTests: XCTestCase {
         let env = ActiveWorkoutEnvironment(
             uuid: UUID.incrementing,
             mainQueue: scheduler.eraseToAnyScheduler(),
-            now: { self.now }
+            now: { self.now },
+            locationManager: .failing
         )
 
         let workoutPlan = WorkoutPlan(id: UUID(), name: "Running", intervals: [])

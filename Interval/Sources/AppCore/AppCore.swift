@@ -45,12 +45,19 @@ public let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
             )
         }
     ),
-    activeWorkoutReducer
+    activeWorkoutProgressReducer
         .optional()
         .pullback(
             state: \.activeWorkout,
             action: /AppAction.activeWorkoutAction,
-            environment: { ActiveWorkoutEnvironment(uuid: $0.uuid, mainQueue: .main.eraseToAnyScheduler(), now: Date.init)}),
+            environment: {
+                ActiveWorkoutEnvironment(
+                    uuid: $0.uuid,
+                    mainQueue: .main.eraseToAnyScheduler(),
+                    now: Date.init,
+                    locationManager: .live
+                )
+            }),
     startWorkoutReducer
 )
 //.debug()

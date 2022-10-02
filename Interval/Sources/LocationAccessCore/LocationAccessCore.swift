@@ -13,6 +13,7 @@ public enum LocationAccess {
     case initial
     case unknownUserDecision
     case userRejectedAccess
+    case authorized
 }
 
 public enum LocationAccessAction: Equatable {
@@ -39,10 +40,25 @@ public let locationRequestReducer = Reducer<LocationAccess, LocationAccessAction
 
     switch action {
     case .onAppear:
-        return env.locationManager
-            .delegate()
-            .map(LocationAccessAction.locationManager)
-            .cancellable(id: LocationEventsSubscribtion.self)
+        switch env.locationManager.authorizationStatus() {
+        case .notDetermined:
+            state = .unknownUserDecision
+            return env.locationManager
+                .delegate()
+                .map(LocationAccessAction.locationManager)
+                .cancellable(id: LocationEventsSubscribtion.self)
+
+        case .restricted, .denied:
+            state = .userRejectedAccess
+            return .none
+
+        case .authorizedAlways, .authorizedWhenInUse:
+            return Effect(value: .onAuthGranted)
+
+        @unknown default:
+            state = .userRejectedAccess
+            return .none
+        }
 
     case .onTapAuthorize:
         return env.locationManager
@@ -50,6 +66,7 @@ public let locationRequestReducer = Reducer<LocationAccess, LocationAccessAction
             .fireAndForget()
 
     case .onAuthGranted:
+        state = .authorized
         return .cancel(id: LocationEventsSubscribtion.self)
 
     case .onClose:

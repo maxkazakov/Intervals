@@ -13,6 +13,8 @@ import ComposableArchitecture
 import ActiveWorkoutCore
 import WorkoutPlanCore
 import IntervalCore
+import LocationAccessUI
+import LocationAccessCore
 
 public struct ActiveWorkoutView: View {
     public init(store: Store<ActiveWorkout, ActiveWorkoutAction>) {
@@ -24,60 +26,80 @@ public struct ActiveWorkoutView: View {
     public var body: some View {
         WithViewStore(store) { viewStore in
             ZStack {
-                VStack {
-                    switch viewStore.state.currentIntervalStep.finishType {
-                    case .byDistance:
-                        EmptyView()
+                GeometryReader { proxy in }
+                    .background(Color.yellow.ignoresSafeArea())
 
-                    case let .byDuration(seconds):
-                        CountdownTimerView(
-                            viewModel: CountdownTimerViewModel(
-                                fullTime: seconds * 1000,
-                                viewStore: viewStore
-                            )
-                        )
-                        .id(viewStore.state.currentIntervalStep.id)
+                ZStack {
+                    if viewStore.state.preparationStatus.isPrepared {
+                        VStack {
+                            switch viewStore.state.currentIntervalStep.finishType {
+                            case .byDistance:
+                                EmptyView()
 
-                    case .byTappingButton:
-                        TimerView(
-                            viewStore: viewStore,
-                            textView: Text(viewStore.currentIntervalStep.name).font(.title2)
-                        )
-                        .id(viewStore.state.currentIntervalStep.id)
-                    }
+                            case let .byDuration(seconds):
+                                CountdownTimerView(
+                                    viewModel: CountdownTimerViewModel(
+                                        fullTime: seconds * 1000,
+                                        viewStore: viewStore
+                                    )
+                                )
+                                .id(viewStore.state.currentIntervalStep.id)
 
-                    HStack {
-                        Spacer()
-                        NextStepButton(title: "next", action: { viewStore.send(.stepFinished) })
-                    }
-                    .opacity(viewStore.state.status == .initial ? 0 : 1)
-                }
+                            case .byTappingButton:
+                                TimerView(
+                                    viewStore: viewStore,
+                                    textView: Text(viewStore.currentIntervalStep.name).font(.title2)
+                                )
+                                .id(viewStore.state.currentIntervalStep.id)
+                            }
 
-                VStack {
-                    if viewStore.state.status != .initial {
-                        HStack {
-                            StopButton(onStop: { viewStore.send(.stop) })
-                            Spacer()
-                            if let pauseButtonState = mapStatusToButton(viewStore.state.status) {
-                                PauseResumeButton(state: pauseButtonState,
-                                                  onStart: { viewStore.send(.start) },
-                                                  onPause: { viewStore.send(.pause) })
+                            HStack {
+                                Spacer()
+                                NextStepButton(title: "next", action: { viewStore.send(.stepFinished) })
+                            }
+                            .opacity(viewStore.state.status == .initial ? 0 : 1)
+                        }
+
+                        VStack {
+                            if viewStore.state.status != .initial {
+                                HStack {
+                                    StopButton(onStop: { viewStore.send(.stop) })
+                                    Spacer()
+                                    if let pauseButtonState = mapStatusToButton(viewStore.state.status) {
+                                        PauseResumeButton(state: pauseButtonState,
+                                                          onStart: { viewStore.send(.start) },
+                                                          onPause: { viewStore.send(.pause) })
+                                    }
+                                }
+                                Spacer()
+                            } else {
+                                Spacer()
+                                HStack {
+                                    Spacer()
+                                    StartButton(onStart: { viewStore.send(.start) })
+                                    Spacer()
+                                }
                             }
                         }
-                        Spacer()
                     } else {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            StartButton(onStart: { viewStore.send(.start) })
-                            Spacer()
-                        }
+                        LocationAccessView(
+                            store: store.scope(
+                                state: \.preparationStatus.locationStatus,
+                                action: ActiveWorkoutAction.locationAccess
+                            )
+                        )
                     }
                 }
+                .padding(.horizontal, 12)
             }
-            .padding(.horizontal, 12)
-            .background(Color.yellow.ignoresSafeArea())
+            .onAppear(perform: { viewStore.send(.onAppear) })
         }
+    }
+
+
+    var progressView: some View {
+        ProgressView()
+            .progressViewStyle(CircularProgressViewStyle(tint: .black))
     }
 
     func mapStatusToButton(_ status: ActiveWorkoutStatus) -> PauseResumeButtonState? {
@@ -113,8 +135,13 @@ struct ActiveWorkoutView_Previews: PreviewProvider {
                 workoutPlan: workoutPlan,
                 intervalSteps: []
             ),
-            reducer: activeWorkoutReducer,
-            environment: ActiveWorkoutEnvironment(uuid: UUID.init, mainQueue: .immediate.eraseToAnyScheduler(), now: Date.init)
+            reducer: activeWorkoutProgressReducer,
+            environment: ActiveWorkoutEnvironment(
+                uuid: UUID.init,
+                mainQueue: .immediate.eraseToAnyScheduler(),
+                now: Date.init,
+                locationManager: .failing
+            )
         ))
     }
 }
