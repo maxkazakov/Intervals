@@ -179,6 +179,9 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
 //                return .none
 //            }
 
+        case .locationAccess(.onClose):
+            return Effect(value: .stop)
+
         case .locationAccess:
             return .none
         }

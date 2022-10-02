@@ -21,9 +21,7 @@ public enum LocationAccessAction: Equatable {
 
     case onTapAuthorize
     case onAppear
-    case onClose    
-
-    // for external
+    case onClose
     case onAuthGranted
 }
 
@@ -70,7 +68,7 @@ public let locationRequestReducer = Reducer<LocationAccess, LocationAccessAction
         return .cancel(id: LocationEventsSubscribtion.self)
 
     case .onClose:
-        return .cancel(id: LocationEventsSubscribtion.self)
+        return .cancel(id:  LocationEventsSubscribtion.self)
 
     case let .locationManager(.didChangeAuthorization(status)):
         switch status {

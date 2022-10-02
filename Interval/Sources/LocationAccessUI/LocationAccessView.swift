@@ -27,6 +27,22 @@ public struct LocationAccessView: View {
                 case .userRejectedAccess:
                     UserRejectedAccessView(viewStore: viewStore)
                 }
+
+                VStack {
+                    HStack {
+                        Button(action: {
+                            viewStore.send(.onClose)
+                        }, label: {
+                            Image(systemName: "xmark")
+                                .imageScale(.large)
+                                .foregroundColor(.black)
+                        })
+                        .padding()
+
+                        Spacer()
+                    }
+                    Spacer()
+                }
             }
             .onAppear(perform: {
                 print("LocationAccessView onAppear!")
@@ -44,9 +60,16 @@ struct UnknownUserDecisionView: View {
             Text("Allow access to your location")
             VStack {
                 Spacer()
-                Button("Allow Access") {
+                Button(action: {
                     viewStore.send(.onTapAuthorize)
-                }
+                }, label: {
+                    Text("Allow Access")
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .foregroundColor(.white)
+                        .background(Color.black)
+                        .clipShape(Capsule(style: .continuous))
+                })
             }
         }
     }
@@ -60,9 +83,16 @@ struct UserRejectedAccessView: View {
             Text("Allow access to your location")
             VStack {
                 Spacer()
-                Button("Open Settings") {
+                Button(action: {
                     UIApplication.shared.open(URL(string:UIApplication.openSettingsURLString)!)
-                }
+                }, label: {
+                    Text("Open Settings")
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .foregroundColor(.white)
+                        .background(Color.black)
+                        .clipShape(Capsule(style: .continuous))
+                })
             }
         }
     }
