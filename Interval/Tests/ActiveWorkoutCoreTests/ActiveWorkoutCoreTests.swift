@@ -49,6 +49,7 @@ final class ActiveWorkoutCoreTests: XCTestCase {
         store.send(.start) {
             $0.status = .inProgress
         }
+        store.receive(.locationTracker(.startTracking))
 
         scheduler.advance(by: .seconds(0.2))
 
@@ -64,12 +65,14 @@ final class ActiveWorkoutCoreTests: XCTestCase {
         store.send(.pause) {
             $0.status = .paused
         }
+        store.receive(.locationTracker(.stopTracking))
 
         scheduler.advance(by: .seconds(0.5))
 
         store.send(.start) {
             $0.status = .inProgress
         }
+        store.receive(.locationTracker(.startTracking))
 
         scheduler.advance(by: .seconds(0.2))
 
@@ -85,6 +88,7 @@ final class ActiveWorkoutCoreTests: XCTestCase {
         store.send(.stop) {
             $0.status = .paused
         }
+        store.receive(.locationTracker(.stopTracking))
     }
 
     func testFewCountdownIntervalsFlow() throws {
@@ -126,6 +130,7 @@ final class ActiveWorkoutCoreTests: XCTestCase {
         store.send(.start) {
             $0.status = .inProgress
         }
+        store.receive(.locationTracker(.startTracking))
 
         scheduler.advance(by: .seconds(1))
 
@@ -141,17 +146,23 @@ final class ActiveWorkoutCoreTests: XCTestCase {
             $0.intervalSteps[0].isFinished = true
         }
 
-        scheduler.advance(by: .seconds(1))
+        scheduler.advance(by: .seconds(2))
 
-        (1...10).forEach { tickIdx in
+        (1...20).forEach { tickIdx in
             store.receive(.timerTicked) {
                 $0.time = 100 * tickIdx + 1000
                 $0.currentIntervalStep.time = 100 * tickIdx
             }
         }
 
-        store.send(.stop) {
+        store.receive(.stepFinished) {
+            $0.currentIntervalIdx = 1
+            $0.intervalSteps[1].isFinished = true
+        }
+
+        store.receive(.stop) {
             $0.status = .paused
         }
+        store.receive(.locationTracker(.stopTracking))
     }
 }
