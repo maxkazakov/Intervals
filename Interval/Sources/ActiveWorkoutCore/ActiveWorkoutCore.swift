@@ -9,6 +9,7 @@ import SwiftUI
 import IntervalCore
 import WorkoutPlanCore
 import LocationAccessCore
+import LocationTracker
 
 import ComposableArchitecture
 import ComposableCoreLocation
@@ -31,6 +32,7 @@ public struct WorkoutIntervalStep: Equatable {
     public let finishType: FinishType
     public let intervalId: Interval.Id
     public var time: Int = 0 // ms
+    public var fullDistance: Double = 0.0 // meters
     public var isFinished = false
 }
 
@@ -56,10 +58,12 @@ public struct ActiveWorkout: Identifiable, Equatable {
     public var id: UUID
     public let workoutPlan: WorkoutPlan
     public var time: Int = 0 // ms
+    public var fullDistance: Double = 0.0
     public var status: ActiveWorkoutStatus = .initial
     public var intervalSteps: [WorkoutIntervalStep]
     public var currentIntervalIdx: Int = 0
     public var preparationStatus = WorkoutPreparationStatus()
+    public var locationTracker = LocationTracker(lastLocation: nil, currentSpeed: 0.0)
 
     public var currentIntervalStep: WorkoutIntervalStep {
         get { intervalSteps[currentIntervalIdx] }
@@ -96,13 +100,12 @@ public enum ActiveWorkoutAction: Equatable {
     case timerTicked
 
     case locationAccess(LocationAccessAction)
-//    case locationManager(LocationManager.Action)
+    case locationTracker(LocationTrackerAction)
 }
 
 public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, ActiveWorkoutEnvironment>(
     { state, action, env in
         struct TimerID: Hashable {}
-        enum LocationEventsSubscribtion {}
         let tickMs: Int = 100
 
         func startTimer() -> Effect<ActiveWorkoutAction, Never> {
@@ -117,11 +120,14 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
         switch action {
 
         case .onAppear:
-            return .none
-            //        return env.locationManager
-            //            .delegate()
-            //            .map(ActiveWorkoutAction.locationManager)
-            //            .cancellable(id: LocationEventsSubscribtion.self)
+            return env.locationManager.set(
+                activityType: .fitness,
+                allowsBackgroundLocationUpdates: true,
+                desiredAccuracy: kCLLocationAccuracyBestForNavigation,
+                distanceFilter: 7,
+                pausesLocationUpdatesAutomatically: false
+            )
+            .fireAndForget()
 
         case .timerTicked:
             state.time += tickMs
@@ -137,18 +143,26 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
             }
             return .none
 
-
         case .start:
             state.status = .inProgress
-            return startTimer()
+            return .merge(
+                startTimer(),
+                Effect(value: .locationTracker(.startTracking))
+            )
 
         case .pause:
             state.status = .paused
-            return .cancel(id: TimerID())
+            return .merge(
+                .cancel(id: TimerID()),
+                Effect(value: .locationTracker(.stopTracking))
+            )
 
         case .stop:
             state.status = .paused
-            return .merge(.cancel(id: TimerID()), .cancel(id: LocationEventsSubscribtion.self))
+            return .merge(
+                .cancel(id: TimerID()),
+                Effect(value: .locationTracker(.stopTracking))
+            )
 
         case .stepFinished:
             state.currentIntervalStep.isFinished = true
@@ -158,31 +172,21 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
             }
             state.currentIntervalIdx = nextIdx
 
-            // Restart timer, because next tick can be somewhere between swithing stages
+            // Restart timer, because next tick can be somewhere between switching stages
             return .merge([
                 .cancel(id: TimerID()),
                 startTimer()
             ])
 
-//        case let .locationManager(.didChangeAuthorization(status)):
-//            switch status {
-//            case .notDetermined, .restricted, .denied:
-//                state.preparationStatus.locationStatus = .waitingForLocationAiuth
-//                return .none
-//
-//            case .authorizedAlways, .authorizedWhenInUse:
-//                state.preparationStatus.locationStatus = .authrorized
-//                return .none
-//
-//            @unknown default:
-//                state.preparationStatus.locationStatus = .waitingForLocationAiuth
-//                return .none
-//            }
-
         case .locationAccess(.onClose):
             return Effect(value: .stop)
 
-        case .locationAccess:
+        case let .locationTracker(.didPassedDistance(meters: meters)):
+            state.fullDistance += meters
+            state.currentIntervalStep.fullDistance += meters
+            return .none
+
+        case .locationAccess, .locationTracker:
             return .none
         }
     }
@@ -191,6 +195,11 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
 
 public let activeWorkoutProgressReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, ActiveWorkoutEnvironment>.combine(
     activeWorkoutReducer,
+    locationTrackerReducer.pullback(
+        state: \.locationTracker,
+        action: /ActiveWorkoutAction.locationTracker,
+        environment: { LocationTrackerEnvironment(locationManager: $0.locationManager) }
+    ),
     locationRequestReducer.pullback(
         state: \.preparationStatus.locationStatus,
         action: /ActiveWorkoutAction.locationAccess,
