@@ -177,5 +177,12 @@ let package = Package(
             dependencies: ["LocationAccessCore",
                            "TestHelpers"]
         ),
+        .testTarget(
+            name: "LocationTrackerTests",
+            dependencies: [
+                "LocationTracker",
+                .product(name: "ComposableCoreLocation", package: "composable-core-location")
+            ]
+        ),
     ]
 )

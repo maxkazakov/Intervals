@@ -33,8 +33,13 @@ public struct ActiveWorkoutView: View {
                     if viewStore.state.preparationStatus.isPrepared {
                         VStack {
                             switch viewStore.state.currentIntervalStep.finishType {
-                            case .byDistance:
-                                EmptyView()
+                            case let .byDistance(meters):
+                                DistanceTimerView(
+                                    viewStore: viewStore,
+                                    fullDistanceMeters: meters,
+                                    nameView: Text(viewStore.currentIntervalStep.name).font(.title2)
+                                )
+                                    .id(viewStore.state.currentIntervalStep.id)
 
                             case let .byDuration(seconds):
                                 CountdownTimerView(
@@ -48,7 +53,7 @@ public struct ActiveWorkoutView: View {
                             case .byTappingButton:
                                 TimerView(
                                     viewStore: viewStore,
-                                    textView: Text(viewStore.currentIntervalStep.name).font(.title2)
+                                    nameView: Text(viewStore.currentIntervalStep.name).font(.title2)
                                 )
                                 .id(viewStore.state.currentIntervalStep.id)
                             }
@@ -59,9 +64,11 @@ public struct ActiveWorkoutView: View {
                             }
                             .opacity(viewStore.state.status == .initial ? 0 : 1)
                         }
+                        .foregroundColor(.black)
 
                         VStack {
-                            if viewStore.state.status != .initial {
+                            switch viewStore.state.status {
+                            case .paused, .inProgress:
                                 HStack {
                                     StopButton(onStop: { viewStore.send(.stop) })
                                     Spacer()
@@ -72,13 +79,28 @@ public struct ActiveWorkoutView: View {
                                     }
                                 }
                                 Spacer()
-                            } else {
+                            case .initial:
                                 Spacer()
                                 HStack {
                                     Spacer()
                                     StartButton(onStart: { viewStore.send(.start) })
                                     Spacer()
                                 }
+                            case .stopped:
+                                HStack {
+                                    Spacer()
+                                    Button(
+                                        action: { viewStore.send(.close) },
+                                        label: {
+                                            Image(systemName: "xmark")
+                                                .foregroundColor(.white)
+                                                .padding(8)
+                                                .background(Color.black)
+                                                .clipShape(Circle())
+                                        }
+                                    )
+                                }
+                                Spacer()
                             }
                         }
                     } else {
@@ -104,7 +126,7 @@ public struct ActiveWorkoutView: View {
 
     func mapStatusToButton(_ status: ActiveWorkoutStatus) -> PauseResumeButtonState? {
         switch status {
-        case .initial: return nil
+        case .initial, .stopped: return nil
         case .inProgress: return .playing
         case .paused: return .paused
         }

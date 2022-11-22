@@ -18,6 +18,7 @@ public enum ActiveWorkoutStatus: Equatable {
     case initial
     case inProgress
     case paused
+    case stopped
 }
 
 public struct WorkoutIntervalStep: Equatable {
@@ -96,6 +97,7 @@ public enum ActiveWorkoutAction: Equatable {
     case pause
     case stop
     case stepFinished
+    case close
 
     case timerTicked
 
@@ -118,11 +120,20 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
         }
 
         switch action {
+        // Handled externally
+        case .close:
+            return .none
 
         case .onAppear:
+            let allowsBackgroundLocationUpdates: Bool
+            #if targetEnvironment(simulator)
+            allowsBackgroundLocationUpdates = false
+            #else
+            allowsBackgroundLocationUpdates = true
+            #endif
             return env.locationManager.set(
                 activityType: .fitness,
-                allowsBackgroundLocationUpdates: true,
+                allowsBackgroundLocationUpdates: allowsBackgroundLocationUpdates,
                 desiredAccuracy: kCLLocationAccuracyBestForNavigation,
                 distanceFilter: 7,
                 pausesLocationUpdatesAutomatically: false
@@ -158,7 +169,7 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
             )
 
         case .stop:
-            state.status = .paused
+            state.status = .stopped
             return .merge(
                 .cancel(id: TimerID()),
                 Effect(value: .locationTracker(.stopTracking))
@@ -171,12 +182,7 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
                 return Effect(value: .stop)
             }
             state.currentIntervalIdx = nextIdx
-
-            // Restart timer, because next tick can be somewhere between switching stages
-            return .merge([
-                .cancel(id: TimerID()),
-                startTimer()
-            ])
+            return .none
 
         case .locationAccess(.onClose):
             return Effect(value: .stop)
@@ -184,6 +190,14 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
         case let .locationTracker(.didPassedDistance(meters: meters)):
             state.fullDistance += meters
             state.currentIntervalStep.fullDistance += meters
+            switch state.currentIntervalStep.finishType {
+            case let .byDistance(fullMeters):
+                if state.currentIntervalStep.fullDistance >= fullMeters {
+                    return Effect(value: .stepFinished)
+                }
+            default:
+                break
+            }
             return .none
 
         case .locationAccess, .locationTracker:
@@ -195,7 +209,9 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
 
 public let activeWorkoutProgressReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, ActiveWorkoutEnvironment>.combine(
     activeWorkoutReducer,
-    locationTrackerReducer.pullback(
+    locationTrackerReducer
+        .debugActions()
+        .pullback(
         state: \.locationTracker,
         action: /ActiveWorkoutAction.locationTracker,
         environment: { LocationTrackerEnvironment(locationManager: $0.locationManager) }
@@ -206,4 +222,3 @@ public let activeWorkoutProgressReducer = Reducer<ActiveWorkout, ActiveWorkoutAc
         environment: { LocationAccessEnvironment(locationManager: $0.locationManager) }
     )
 )
-    .debugActions()

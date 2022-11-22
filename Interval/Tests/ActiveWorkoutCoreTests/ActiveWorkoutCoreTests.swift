@@ -86,7 +86,7 @@ final class ActiveWorkoutCoreTests: XCTestCase {
         }
 
         store.send(.stop) {
-            $0.status = .paused
+            $0.status = .stopped
         }
         store.receive(.locationTracker(.stopTracking))
     }
@@ -161,7 +161,7 @@ final class ActiveWorkoutCoreTests: XCTestCase {
         }
 
         store.receive(.stop) {
-            $0.status = .paused
+            $0.status = .stopped
         }
         store.receive(.locationTracker(.stopTracking))
     }

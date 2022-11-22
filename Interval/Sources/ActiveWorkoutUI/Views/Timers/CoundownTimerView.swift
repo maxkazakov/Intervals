@@ -20,6 +20,7 @@ struct CountdownTimerView: View {
             return remainDuration
         }
     }
+    
     private let animation: AnimationWithDurationProvider = { duration in
             .linear(duration: duration)
     }

@@ -28,7 +28,7 @@ public struct AppEnvironment {
     }
 }
 
-public enum AppAction {    
+public enum AppAction {
     case workoutPlanList(WorkoutPlansListAction)
     case activeWorkoutAction(ActiveWorkoutAction)
 }
@@ -103,7 +103,7 @@ let startWorkoutReducer = Reducer<AppState, AppAction, AppEnvironment>({ state, 
         )
 
         return .none
-    case .activeWorkoutAction(.stop):
+    case .activeWorkoutAction(.close):
         state.activeWorkout = nil
         return .none
     default:

@@ -16,7 +16,7 @@ import ComposableCoreLocation
 //@MainActor
 final class LocationAccessCoreTests: XCTestCase {
 
-    func test_justOpenAndClose() throws {
+    func test_notDetermined_justOpenAndClose() throws {
         let store = TestStore(
             initialState: LocationAccess.initial,
             reducer: locationRequestReducer,
@@ -27,15 +27,16 @@ final class LocationAccessCoreTests: XCTestCase {
 
         let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
         store.environment.locationManager.delegate = { locationManagerSubject.eraseToEffect() }
-        store.environment.locationManager.requestWhenInUseAuthorization = {
-            .none
-        }
+        store.environment.locationManager.authorizationStatus = { .notDetermined }
+        store.environment.locationManager.requestWhenInUseAuthorization = { .none }
 
-        store.send(.onAppear)
+        store.send(.onAppear) {
+            $0 = .unknownUserDecision
+        }
         store.send(.onClose)
     }
 
-    func test_userRejectedAuthorization() throws {
+    func test_notDetermined__userRejectedAuthorization() throws {
         let store = TestStore(
             initialState: LocationAccess.initial,
             reducer: locationRequestReducer,
@@ -48,11 +49,14 @@ final class LocationAccessCoreTests: XCTestCase {
         let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
 
         store.environment.locationManager.delegate = { locationManagerSubject.eraseToEffect() }
+        store.environment.locationManager.authorizationStatus = { .notDetermined }
         store.environment.locationManager.requestWhenInUseAuthorization = {
             .fireAndForget { didRequestInUseAuthorization = true }
         }
 
-        store.send(.onAppear)
+        store.send(.onAppear) {
+            $0 = .unknownUserDecision
+        }
         store.send(.onTapAuthorize)
 
         XCTAssertTrue(didRequestInUseAuthorization)
@@ -65,7 +69,7 @@ final class LocationAccessCoreTests: XCTestCase {
         store.send(.onClose)
     }
 
-    func test_userAcceptedAuthorization() throws {
+    func test_notDetermined_userAcceptedAuthorization() throws {
         let store = TestStore(
             initialState: LocationAccess.initial,
             reducer: locationRequestReducer,
@@ -78,18 +82,23 @@ final class LocationAccessCoreTests: XCTestCase {
         let locationManagerSubject = PassthroughSubject<LocationManager.Action, Never>()
 
         store.environment.locationManager.delegate = { locationManagerSubject.eraseToEffect() }
+        store.environment.locationManager.authorizationStatus = { .notDetermined }
         store.environment.locationManager.requestWhenInUseAuthorization = {
             .fireAndForget { didRequestInUseAuthorization = true }
         }
 
-        store.send(.onAppear)
+        store.send(.onAppear)  {
+            $0 = .unknownUserDecision
+        }
         store.send(.onTapAuthorize)
 
         XCTAssertTrue(didRequestInUseAuthorization)
         locationManagerSubject.send(.didChangeAuthorization(.authorizedWhenInUse))
 
         store.receive(.locationManager(.didChangeAuthorization(.authorizedWhenInUse)))
-        store.receive(.onAuthGranted)
+        store.receive(.onAuthGranted) {
+            $0 = .authorized
+        }
 
         store.send(.onClose)
     }

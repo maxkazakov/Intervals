@@ -42,16 +42,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9BADAA9A2895648F00A32855"
-               BuildableName = "IntervalsUITests.xctest"
-               BlueprintName = "IntervalsUITests"
-               ReferencedContainer = "container:Intervals.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "ActiveWorkoutCoreTests"
                BuildableName = "ActiveWorkoutCoreTests"
                BlueprintName = "ActiveWorkoutCoreTests"
@@ -75,6 +65,36 @@
                BlueprintIdentifier = "WorkoutPlansListCoreTests"
                BuildableName = "WorkoutPlansListCoreTests"
                BlueprintName = "WorkoutPlansListCoreTests"
+               ReferencedContainer = "container:Interval">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "IntervalCoreTests"
+               BuildableName = "IntervalCoreTests"
+               BlueprintName = "IntervalCoreTests"
+               ReferencedContainer = "container:Interval">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "LocationAccessCoreTests"
+               BuildableName = "LocationAccessCoreTests"
+               BlueprintName = "LocationAccessCoreTests"
+               ReferencedContainer = "container:Interval">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "LocationTrackerTests"
+               BuildableName = "LocationTrackerTests"
+               BlueprintName = "LocationTrackerTests"
                ReferencedContainer = "container:Interval">
             </BuildableReference>
          </TestableReference>

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B808E84292D5FA6000B5201 /* test_track.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 9B808E83292D5FA6000B5201 /* test_track.gpx */; };
 		9B862932289878160074739C /* AppCore in Frameworks */ = {isa = PBXBuildFile; productRef = 9B862931289878160074739C /* AppCore */; };
 		9B862934289878190074739C /* AppUI in Frameworks */ = {isa = PBXBuildFile; productRef = 9B862933289878190074739C /* AppUI */; };
 		9BADAA852895648D00A32855 /* IntervalsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BADAA842895648D00A32855 /* IntervalsApp.swift */; };
@@ -27,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9B808E83292D5FA6000B5201 /* test_track.gpx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = test_track.gpx; sourceTree = "<group>"; };
 		9B9852F228970D420037A321 /* Interval */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = Interval; sourceTree = "<group>"; };
 		9BADAA812895648D00A32855 /* Intervals.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Intervals.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BADAA842895648D00A32855 /* IntervalsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntervalsApp.swift; sourceTree = "<group>"; };
@@ -57,6 +59,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9B808E82292D5FA6000B5201 /* MockTracks */ = {
+			isa = PBXGroup;
+			children = (
+				9B808E83292D5FA6000B5201 /* test_track.gpx */,
+			);
+			path = MockTracks;
+			sourceTree = "<group>";
+		};
 		9B9852F3289716320037A321 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -87,6 +97,7 @@
 		9BADAA832895648D00A32855 /* Intervals */ = {
 			isa = PBXGroup;
 			children = (
+				9B808E82292D5FA6000B5201 /* MockTracks */,
 				9BADAA842895648D00A32855 /* IntervalsApp.swift */,
 				9BADAA862895648D00A32855 /* ContentView.swift */,
 				9BADAA882895648F00A32855 /* Assets.xcassets */,
@@ -197,6 +208,7 @@
 			files = (
 				9BADAA8C2895648F00A32855 /* Preview Assets.xcassets in Resources */,
 				9BADAA892895648F00A32855 /* Assets.xcassets in Resources */,
+				9B808E84292D5FA6000B5201 /* test_track.gpx in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

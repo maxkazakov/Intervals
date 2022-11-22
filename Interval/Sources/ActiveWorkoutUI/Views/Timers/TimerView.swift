@@ -10,16 +10,16 @@ import Combine
 import ComposableArchitecture
 import ActiveWorkoutCore
 
-struct TimerView<TextView: View>: View {
+struct TimerView<IntervalNameView: View>: View {
     let viewStore: ViewStore<ActiveWorkout, ActiveWorkoutAction>
-    let textView: TextView
+    let nameView: IntervalNameView
 
     var body: some View {
         ZStack {
             CircleTimerView(percent: 0.0)
 
             VStack {
-                textView
+                nameView
                 Text("\(viewStore.state.currentIntervalStep.time.formatMilliseconds())")
                     .font(.system(.largeTitle, design: .monospaced))
             }

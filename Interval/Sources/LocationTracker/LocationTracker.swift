@@ -27,7 +27,7 @@ public enum LocationTrackerAction: Equatable {
 }
 
 public struct LocationTrackerEnvironment {
-    let locationManager: LocationManager
+    var locationManager: LocationManager
 
     public init(locationManager: LocationManager) {
         self.locationManager = locationManager
