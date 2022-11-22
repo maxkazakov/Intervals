@@ -32,7 +32,7 @@ struct CountdownTimerView: View {
                                    targetValue: 0.0,
                                    remainingDuration: remainingDuration,
                                    animation: animation,
-                                   paused: $viewModel.isPaused)
+                                   paused: $viewModel.isPausedOrStopped)
 
             VStack {
                 Text(viewModel.name).font(.title2)
@@ -48,7 +48,7 @@ class CountdownTimerViewModel: ObservableObject {
 
     @Published var percent = 1.0
     @Published var timeLeft: Int = 0
-    @Published var isPaused = false
+    @Published var isPausedOrStopped = false
 
     let name: String
     let fullTime: Int
@@ -67,6 +67,7 @@ class CountdownTimerViewModel: ObservableObject {
     var isAppeared = false
     func onAppear() {
         guard !isAppeared else { return }
+        isAppeared = true
 
         viewStore.publisher
             .sink(receiveValue: { [weak self] state in
@@ -77,12 +78,12 @@ class CountdownTimerViewModel: ObservableObject {
 
     var animationStarted = false
     func onStateChanged(_ state: ActiveWorkout) {
-        self.timeLeft = fullTime - state.currentIntervalStep.time        
+        self.timeLeft = fullTime - state.currentIntervalStep.time
 
         guard currentState != state.status else { return }
         defer { currentState = state.status }
 
-        isPaused = state.status == .paused
+        isPausedOrStopped = state.status == .paused || state.status == .stopped
 
         if state.status == .inProgress, !animationStarted {
             animationStarted = true

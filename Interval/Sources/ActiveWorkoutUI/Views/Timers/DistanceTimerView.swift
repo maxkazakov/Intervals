@@ -12,6 +12,7 @@ struct DistanceTimerView<IntervalNameView: View>: View {
     var body: some View {
         ZStack {
             CircleTimerView(percent: max(0.0, 1 - viewStore.currentIntervalStep.fullDistance / fullDistanceMeters))
+                .animation(.default, value: viewStore.currentIntervalStep.fullDistance)
 
             VStack {
                 nameView

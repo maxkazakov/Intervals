@@ -72,6 +72,7 @@ public struct ActiveWorkoutView: View {
                                 HStack {
                                     StopButton(onStop: { viewStore.send(.stop) })
                                     Spacer()
+                                    
                                     if let pauseButtonState = mapStatusToButton(viewStore.state.status) {
                                         PauseResumeButton(state: pauseButtonState,
                                                           onStart: { viewStore.send(.start) },
@@ -89,16 +90,14 @@ public struct ActiveWorkoutView: View {
                             case .stopped:
                                 HStack {
                                     Spacer()
-                                    Button(
-                                        action: { viewStore.send(.close) },
-                                        label: {
-                                            Image(systemName: "xmark")
-                                                .foregroundColor(.white)
-                                                .padding(8)
-                                                .background(Color.black)
-                                                .clipShape(Circle())
-                                        }
-                                    )
+                                    Button(action: {
+                                        viewStore.send(.close)
+                                    }, label: {
+                                        Image(systemName: "xmark")
+                                            .imageScale(.large)
+                                            .foregroundColor(.black)
+                                    })
+                                    .padding()
                                 }
                                 Spacer()
                             }
