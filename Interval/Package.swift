@@ -140,7 +140,8 @@ let package = Package(
             name: "ActiveWorkoutUI",
             dependencies: [
                 "ActiveWorkoutCore",
-                "LocationAccessUI"
+                "LocationAccessUI",
+                "Utils"
             ]
         ),
         .target(
@@ -149,7 +150,9 @@ let package = Package(
                 .product(name: "ComposableCoreLocation", package: "composable-core-location")
             ]
         ),
-        
+        .target(
+            name: "Utils"
+        ),
         .target(
             name: "TestHelpers"
         ),
@@ -184,5 +187,6 @@ let package = Package(
                 .product(name: "ComposableCoreLocation", package: "composable-core-location")
             ]
         ),
+
     ]
 )

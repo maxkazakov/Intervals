@@ -15,6 +15,7 @@ import WorkoutPlanCore
 import IntervalCore
 import LocationAccessUI
 import LocationAccessCore
+import Utils
 
 public struct ActiveWorkoutView: View {
     public init(store: Store<ActiveWorkout, ActiveWorkoutAction>) {
@@ -63,6 +64,37 @@ public struct ActiveWorkoutView: View {
                                 NextStepButton(title: "next", action: { viewStore.send(.stepFinished) })
                             }
                             .opacity(viewStore.state.status == .initial ? 0 : 1)
+
+                            VStack(spacing: 12) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("time")
+                                        Text(viewStore.state.time.formatMilliseconds())
+                                            .font(.system(.title, design: .monospaced))
+                                    }
+                                    Spacer()
+                                    VStack(alignment: .trailing, spacing: 4) {
+                                        Text("distance")
+                                        Text(viewStore.state.fullDistance.formatMeters(withUnit: true))
+                                            .font(.system(.title, design: .monospaced))
+                                    }
+                                }
+
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("pace")
+                                        Text(viewStore.state.locationTracker.currentPace.formatSecondsPerKm())
+                                            .font(.system(.title, design: .monospaced))
+                                    }
+                                    Spacer()
+                                    VStack(alignment: .trailing, spacing: 4) {
+                                        Text("pulse")
+                                        Text("150")
+                                            .font(.system(.title, design: .monospaced))
+                                    }
+                                }
+                            }
+                            .padding()
                         }
                         .foregroundColor(.black)
 

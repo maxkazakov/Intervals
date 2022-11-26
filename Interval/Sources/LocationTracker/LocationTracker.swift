@@ -9,19 +9,20 @@ import ComposableArchitecture
 import ComposableCoreLocation
 
 public struct LocationTracker: Equatable {
-    public init(lastLocation: Location? = nil, currentSpeed: Double) {
+    public init(lastLocation: Location? = nil, currentPace: Double) {
         self.lastLocation = lastLocation
-        self.currentSpeed = currentSpeed
+        self.currentPace = currentPace
     }
 
     public var lastLocation: Location?
-    public var currentSpeed: Double
+    public var currentPace: Double // secs / km
+    var lastPaceIntervals: [Double] = []
 }
 
 public enum LocationTrackerAction: Equatable {
     case startTracking
     case stopTracking
-    case didPassedDistance(meters: Double)
+    case didPassedDistance(meters: Double, timeInterval: Double)
 
     case locationManager(LocationManager.Action)
 }
@@ -51,12 +52,25 @@ public let locationTrackerReducer = Reducer<LocationTracker, LocationTrackerActi
 
     case .stopTracking:
         state.lastLocation = nil
+        state.lastPaceIntervals = []
         return .merge(
             .cancel(id: LocationEventsSubscribtion.self),
             env.locationManager.stopUpdatingLocation().fireAndForget()
         )
 
-    case let .didPassedDistance(meters):
+    case let .didPassedDistance(meters, timeInterval):
+        let pace = meters / timeInterval
+        state.lastPaceIntervals.append(pace)
+
+        let last5 = state.lastPaceIntervals.suffix(5)
+        if last5.count == 5 {
+            let meterPerSec = last5.reduce(0.0, +) / Double(last5.count)
+            let secPerKm = 1 / meterPerSec * 1000
+            state.currentPace = secPerKm
+            state.lastPaceIntervals = Array(last5)
+        } else {
+            state.currentPace = 0.0
+        }
         return .none
 
     case let .locationManager(.didUpdateLocations(locations)):
@@ -65,8 +79,9 @@ public let locationTrackerReducer = Reducer<LocationTracker, LocationTrackerActi
         }
         defer { state.lastLocation = locations.last }
         if let lastLocation = state.lastLocation {
+            let timeInterval = newLocation.rawValue.timestamp.timeIntervalSince1970 - lastLocation.rawValue.timestamp.timeIntervalSince1970
             let distance = newLocation.rawValue.distance(from: lastLocation.rawValue)
-            return Effect(value: .didPassedDistance(meters: distance))
+            return Effect(value: .didPassedDistance(meters: distance, timeInterval: timeInterval))
         }
         return .none
 

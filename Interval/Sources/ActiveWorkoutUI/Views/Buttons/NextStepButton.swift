@@ -17,7 +17,6 @@ struct NextStepButton: View {
             action: { action() },
             label: {
                 Image(systemName: "forward.fill")
-                //                    .imageScale(.large)
                     .foregroundColor(.white)
                     .padding(8)
                     .background(Color.black)

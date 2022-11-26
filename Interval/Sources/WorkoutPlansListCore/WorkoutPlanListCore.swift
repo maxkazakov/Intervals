@@ -15,7 +15,6 @@ import IntervalCore
 import WorkoutPlanCore
 import WorkoutPlansStorage
 
-
 public struct WorkoutPlansList: Equatable {
 
     public enum LoadingStatus: Equatable {

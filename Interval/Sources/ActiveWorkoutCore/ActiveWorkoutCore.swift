@@ -64,7 +64,7 @@ public struct ActiveWorkout: Identifiable, Equatable {
     public var intervalSteps: [WorkoutIntervalStep]
     public var currentIntervalIdx: Int = 0
     public var preparationStatus = WorkoutPreparationStatus()
-    public var locationTracker = LocationTracker(lastLocation: nil, currentSpeed: 0.0)
+    public var locationTracker = LocationTracker(lastLocation: nil, currentPace: 0.0)
 
     public var currentIntervalStep: WorkoutIntervalStep {
         get { intervalSteps[currentIntervalIdx] }
@@ -187,7 +187,7 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
         case .locationAccess(.onClose):
             return Effect(value: .stop)
 
-        case let .locationTracker(.didPassedDistance(meters: meters)):
+        case let .locationTracker(.didPassedDistance(meters: meters, _)):
             state.fullDistance += meters
             state.currentIntervalStep.fullDistance += meters
             switch state.currentIntervalStep.finishType {
