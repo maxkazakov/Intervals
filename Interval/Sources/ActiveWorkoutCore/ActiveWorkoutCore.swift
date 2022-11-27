@@ -35,6 +35,7 @@ public struct WorkoutIntervalStep: Equatable {
     public var time: Int = 0 // ms
     public var fullDistance: Double = 0.0 // meters
     public var isFinished = false
+    public var locations: [[Location]] = [[]]
 }
 
 public struct WorkoutPreparationStatus: Equatable {
@@ -197,6 +198,12 @@ public let activeWorkoutReducer = Reducer<ActiveWorkout, ActiveWorkoutAction, Ac
                 }
             default:
                 break
+            }
+            return .none
+
+        case let .locationTracker(.locationTracked(location)):
+            state.currentIntervalStep.locations.indices.last.map {
+                state.currentIntervalStep.locations[$0].append(location)
             }
             return .none
 

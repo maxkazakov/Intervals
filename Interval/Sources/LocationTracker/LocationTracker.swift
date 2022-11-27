@@ -23,6 +23,7 @@ public enum LocationTrackerAction: Equatable {
     case startTracking
     case stopTracking
     case didPassedDistance(meters: Double, timeInterval: Double)
+    case locationTracked(Location)
 
     case locationManager(LocationManager.Action)
 }
@@ -74,18 +75,35 @@ public let locationTrackerReducer = Reducer<LocationTracker, LocationTrackerActi
         return .none
 
     case let .locationManager(.didUpdateLocations(locations)):
+        let filteredLocations = filter(locations: locations)
         guard let newLocation = locations.last else {
             return .none
         }
+        let locationTrackedEffect = Effect<LocationTrackerAction, Never>(value: LocationTrackerAction.locationTracked(newLocation))
         defer { state.lastLocation = locations.last }
         if let lastLocation = state.lastLocation {
             let timeInterval = newLocation.rawValue.timestamp.timeIntervalSince1970 - lastLocation.rawValue.timestamp.timeIntervalSince1970
             let distance = newLocation.rawValue.distance(from: lastLocation.rawValue)
-            return Effect(value: .didPassedDistance(meters: distance, timeInterval: timeInterval))
+            return .merge(
+                locationTrackedEffect,
+                Effect(value: .didPassedDistance(meters: distance, timeInterval: timeInterval))
+            )
         }
-        return .none
+        return locationTrackedEffect
 
-    case .locationManager:
+    case .locationManager, .locationTracked:
         return .none
     }
 })
+
+private func filter(locations: [Location]) -> [Location] {
+    locations.filter { newLocation in
+        let howRecent = abs(newLocation.timestamp.timeIntervalSinceNow)
+        guard newLocation.horizontalAccuracy > 0,
+              newLocation.horizontalAccuracy < 50,
+              abs(howRecent) < 10 else {
+            return false
+        }
+        return true
+    }
+}
